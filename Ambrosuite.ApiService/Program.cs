@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 
 
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -115,6 +116,11 @@ record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
 }
 */
 
+//Configuración Swagger 
+builder.Services.AddEndpointsApiExplorer();
+
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -127,5 +133,9 @@ app.UseAuthorization();
 app.UseCors("AllowLocalhost");
 
 app.MapControllers();
+
+//Inicia swagger
+app.UseSwagger();
+app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Ambrosuite API"));
 
 app.Run();
