@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "apis1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/AmbrosuiteApiServiceapi/apis/AmbrosuiteApiService",
+      "type": "apis.azure"
+    }
+  }
+}
