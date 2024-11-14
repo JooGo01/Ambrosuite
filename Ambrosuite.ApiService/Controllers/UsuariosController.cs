@@ -2,6 +2,7 @@
 using Ambrosuite.ApiService.Entities;
 using Ambrosuite.ApiService.EntitiesDTO;
 using Ambrosuite.ApiService.Interfaces;
+using Ambrosuite.ApiService.Services;
 using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -16,11 +17,13 @@ namespace Ambrosuite.ApiService.Controllers
         private readonly DataContext _context;
         private readonly IMapper _mapper;
         private readonly IUsuarioService _usuarioService;
+        private readonly ITokenService _tokenService;
 
-        public UsuariosController(DataContext context, IMapper mapper, IUsuarioService usuarioService)
+        public UsuariosController(DataContext context, IMapper mapper, ITokenService tokenService, IUsuarioService usuarioService)
         {
             _context = context;
             _mapper = mapper;
+            _tokenService = tokenService;
             _usuarioService = usuarioService;
         }
 
@@ -48,7 +51,11 @@ namespace Ambrosuite.ApiService.Controllers
                 return Unauthorized(new { mensaje = "Credenciales incorrectas" });
             }
 
-            return Ok(usuario);
+            //return Ok(usuario);
+            // Si el usuario es válido, generar el token
+            var token = _tokenService.GenerateToken(usuario);
+
+            return Ok(new { token });
         }
 
         [HttpGet]
