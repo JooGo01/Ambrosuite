@@ -1,5 +1,5 @@
-using Ambrosuite.Web;
 using Ambrosuite.Web.Components;
+using Ambrosuite.Web;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,32 +12,33 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
-    {
-        // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-        // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-        client.BaseAddress = new("https+http://apiservice");
-    });
+// Configura Kestrel para escuchar en los puertos deseados
+//builder.WebHost.UseUrls("https://localhost:2215", "http://localhost:2216");
+
+builder.WebHost.ConfigureKestrel(options =>
+{
+    // Puerto HTTPS
+    options.ListenAnyIP(2215, listenOptions => listenOptions.UseHttps());  // HTTPS en el puerto 2215
+    // Puerto HTTP
+    options.ListenAnyIP(2216);  // HTTP en el puerto 2216
+});
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
-
 app.UseOutputCache();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
 
-app.MapDefaultEndpoints();
+//app.MapDefaultEndpoints();
 
 app.Run();

@@ -23,6 +23,21 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
+/*
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(2215, listenOptions => listenOptions.UseHttps());  // HTTPS en el puerto 2215
+    options.ListenAnyIP(2216);  // HTTP en el puerto 2216
+});
+*/
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowLocalhost",
+        builder => builder.WithOrigins("http://localhost:2215")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod());
+});
+
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
@@ -108,6 +123,8 @@ app.UseExceptionHandler();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
+
+app.UseCors("AllowLocalhost");
 
 app.MapControllers();
 
