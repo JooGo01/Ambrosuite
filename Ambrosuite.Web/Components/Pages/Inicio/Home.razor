@@ -1,0 +1,127 @@
+﻿@page "/ambrosuite"
+@using Ambrosuite.Web.ServicesWeb
+@using Ambrosuite.ApiService.Entities;
+@inject MesasService MesasService
+@rendermode InteractiveServer
+@inject IJSRuntime JSRuntime
+
+<PageTitle>Gestión de Mesas</PageTitle>
+
+<div class="layout-container">
+    <div class="main-content">
+        <div class="top-bar">
+            <h1>Gestión de Mesas</h1>
+            <div class="search-container">
+                <input type="text"
+                placeholder="Buscar..."
+                @bind="searchQuery"
+                @bind:event="oninput"
+                aria-label="Buscar mesas" />
+                <span class="oi oi-magnifying-glass"></span>
+            </div>
+        </div>
+
+        @if (isLoading)
+        {
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Cargando mesas...</p>
+            </div>
+        }
+        else if (!string.IsNullOrEmpty(error))
+        {
+            <div class="error-container">
+                <span class="oi oi-warning"></span>
+                <p>Error al cargar las mesas: @error</p>
+                <button class="retry-button" @onclick="LoadTables">Reintentar</button>
+            </div>
+        }
+        else
+        {
+            <div class="tables-grid">
+                @foreach (var table in FilteredTables())
+                {
+                    <div class="table-item">
+                        <div class="table-circle">
+                            <span class="table-number">@table.id</span>
+                            @foreach (var chair in Enumerable.Range(1, 4))
+                            {
+                                <div class="chair chair-@chair"></div>
+                            }
+                        </div>
+                        <div class="table-info">
+                            <span class="status-badge">@table.estado</span>
+                        </div>
+                        <div class="visual-boton">
+                            <button class="btn btn-primary" @onclick='() => HandleTableClick(table.id)'>
+                                Clic para abrir modal
+                            </button>
+                            <button @onclick='() => System.Diagnostics.Debug.WriteLine("Botón clickeado")'>Probar Botón</button>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<!-- Modal de Mesas -->
+@if (isVisible)
+{
+    <p>El modal debería aparecer ahora.</p>
+    <MesasModal mesa="tables.FirstOrDefault(t => t.id == selectedTableId)" CloseModalCallback="CloseModal" />
+}
+
+
+@code {
+    private string searchQuery = string.Empty;
+    private List<Mesa> tables = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private int selectedTableId; // ID de la mesa seleccionada
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTables();
+    }
+
+    private async Task LoadTables()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            tables = await MesasService.GetTablesAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener las mesas: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void HandleTableClick(int id)
+    {
+        System.Diagnostics.Debug.WriteLine($"HandleTableClick ejecutado. ID de mesa: {id}");
+        selectedTableId = id;
+        isVisible = true;
+        StateHasChanged();
+    }
+
+    private IEnumerable<Mesa> FilteredTables()
+    {
+        return tables.Where(t => string.IsNullOrWhiteSpace(searchQuery)
+                                 || t.id.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
+                                 || t.estado.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void CloseModal()
+    {
+        isVisible = false;
+        StateHasChanged();
+    }
+}

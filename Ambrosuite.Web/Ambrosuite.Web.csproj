@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ambrosuite.ApiService\Ambrosuite.ApiService.csproj" />
     <ProjectReference Include="..\Ambrosuite.ServiceDefaults\Ambrosuite.ServiceDefaults.csproj" />
   </ItemGroup>
 

@@ -1,0 +1,61 @@
+@using Ambrosuite.ApiService.Entities;
+
+<div class="modal fade @(mesa != null ? "show" : "")" style="@(mesa != null ? "display: block;" : "display: none; background: rgba(0, 0, 0, 0.5);")">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles de la Mesa</h5>
+                <button type="button" class="btn-close" aria-label="Close" @onclick="CloseModal"></button>
+            </div>
+            <div class="modal-body">
+                @if (mesa != null)
+                {
+                    <p><strong>ID:</strong> @mesa.id</p>
+                    <p><strong>Estado:</strong> @mesa.estado</p>
+                    <div class="modal-actions">
+                        <button class="btn btn-primary" @onclick='() => ChangeStatus("Available")'>Disponible</button>
+                        <button class="btn btn-danger" @onclick='() => ChangeStatus("Occupied")'>Ocupada</button>
+                        <button class="btn btn-warning" @onclick='() => ChangeStatus("Reserved")'>Reservada</button>
+                        <button class="btn btn-info" @onclick='() => ChangeStatus("Cleaning")'>Limpieza</button>
+                    </div>
+                }
+                else
+                {
+                    <p>No hay datos disponibles</p>
+                }
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" @onclick="CloseModal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter] public Mesa? mesa { get; set; }
+    [Parameter] public EventCallback CloseModalCallback { get; set; }
+
+    private async Task ChangeStatus(string newStatus)
+    {
+        int valorEstado = newStatus switch
+        {
+            "Available" => 1,
+            "Occupied" => 2,
+            "Reserved" => 3,
+            "Cleaning" => 4,
+            _ => 0
+        };
+
+        if (mesa != null)
+        {
+            mesa.estado = valorEstado;
+            // Aquí podrías notificar cambios al componente padre si es necesario.
+            await Task.CompletedTask;
+        }
+    }
+
+    private async Task CloseModal()
+    {
+        await CloseModalCallback.InvokeAsync();
+    }
+}

@@ -1,5 +1,6 @@
 using Ambrosuite.Web.Components;
 using Ambrosuite.Web;
+using Ambrosuite.Web.ServicesWeb;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,12 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
 builder.Services.AddOutputCache();
+
+builder.Services.AddHttpClient<MesasService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001"); // Asegúrate de que la URL sea correcta
+});
+
 
 // Configura Kestrel para escuchar en los puertos deseados
 //builder.WebHost.UseUrls("https://localhost:2215", "http://localhost:2216");
