@@ -41,7 +41,7 @@
             <div class="tables-grid">
                 @foreach (var table in FilteredTables())
                 {
-                    <div class="table-item">
+                    <div class="table-item @GetTableStatusClass(table)">
                         <div class="table-circle">
                             <span class="table-number">@table.id</span>
                             @foreach (var chair in Enumerable.Range(1, 4))
@@ -50,13 +50,29 @@
                             }
                         </div>
                         <div class="table-info">
-                            <span class="status-badge">@table.estado</span>
+                            @switch (table.estado)
+                            {
+                                case 0:
+                                    <span class="status-badge">Disponible</span>
+                                    break;
+                                case 1:
+                                    <span class="status-badge">Ocupada</span>
+                                    break;
+                                case 2:
+                                    <span class="status-badge">Reservada</span>
+                                    break;
+                                case 3:
+                                    <span class="status-badge">Limpieza</span>
+                                    break;
+                                default:
+                                    <span class="status-badge">Estado desconocido</span>
+                                    break;
+                            }
                         </div>
                         <div class="visual-boton">
                             <button class="btn btn-primary" @onclick='() => HandleTableClick(table.id)'>
-                                Clic para abrir modal
+                                Ver detalles
                             </button>
-                            <button @onclick='() => System.Diagnostics.Debug.WriteLine("Botón clickeado")'>Probar Botón</button>
                         </div>
                     </div>
                 }
@@ -68,8 +84,7 @@
 <!-- Modal de Mesas -->
 @if (isVisible)
 {
-    <p>El modal debería aparecer ahora.</p>
-    <MesasModal mesa="tables.FirstOrDefault(t => t.id == selectedTableId)" CloseModalCallback="CloseModal" />
+    <MesasModal mesa="tables.FirstOrDefault(t => t.id == selectedTableId)" CloseModalCallback="CloseModal" OnMesaUpdated="HandleMesaUpdated" />
 }
 
 
@@ -85,6 +100,15 @@
     {
         await LoadTables();
     }
+
+    private string GetTableStatusClass(Mesa mesa) => mesa.estado switch
+    {
+        0 => "available",
+        1 => "occupied",
+        2 => "reserved",
+        3 => "cleaning",
+        _ => "unknown"
+    };
 
     private async Task LoadTables()
     {
@@ -123,5 +147,27 @@
     {
         isVisible = false;
         StateHasChanged();
+    }
+
+    private async Task HandleMesaUpdated(Mesa updatedMesa)
+    {
+        try
+        {
+            await MesasService.updateTableAsync(updatedMesa);
+            var mesa = tables.FirstOrDefault(t => t.id == updatedMesa.id);
+            if (mesa != null)
+            {
+                mesa.estado = updatedMesa.estado;
+            }
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al actualizar la mesa: {ex.Message}";
+        }
+        finally
+        {
+            isVisible = false;
+            StateHasChanged();
+        }
     }
 }

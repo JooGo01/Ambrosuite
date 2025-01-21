@@ -1,4 +1,6 @@
 ﻿using Ambrosuite.ApiService.Entities;
+using Ambrosuite.ApiService.EntitiesDTO;
+using System.Diagnostics;
 
 namespace Ambrosuite.Web.ServicesWeb
 {
@@ -22,6 +24,25 @@ namespace Ambrosuite.Web.ServicesWeb
             catch (Exception ex)
             {
                 Console.WriteLine($"Error fetching tables: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task updateTableAsync(Mesa mesa)
+        {
+            try
+            {
+                MesaCreateUpdateDTO mesaUpdate = new MesaCreateUpdateDTO
+                {
+                    estado = mesa.estado
+                };
+                var response = await _httpClient.PutAsJsonAsync("/api/Mesas/" + mesa.id, mesaUpdate);
+                Debug.WriteLine(response);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating table: {ex.Message}");
                 throw;
             }
         }

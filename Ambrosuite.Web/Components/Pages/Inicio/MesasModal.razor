@@ -11,12 +11,12 @@
                 @if (mesa != null)
                 {
                     <p><strong>ID:</strong> @mesa.id</p>
-                    <p><strong>Estado:</strong> @mesa.estado</p>
+                    <p><strong>Estado:</strong> @GetTableStatusClass(mesa)</p>
                     <div class="modal-actions">
-                        <button class="btn btn-primary" @onclick='() => ChangeStatus("Available")'>Disponible</button>
-                        <button class="btn btn-danger" @onclick='() => ChangeStatus("Occupied")'>Ocupada</button>
-                        <button class="btn btn-warning" @onclick='() => ChangeStatus("Reserved")'>Reservada</button>
-                        <button class="btn btn-info" @onclick='() => ChangeStatus("Cleaning")'>Limpieza</button>
+                        <button class="btn btn-primary" @onclick='() => ChangeStatus("Available")' disabled="@(mesa.estado == 0)">Disponible</button>
+                        <button class="btn btn-danger" @onclick='() => ChangeStatus("Occupied")' disabled="@(mesa.estado == 1)">Ocupada</button>
+                        <button class="btn btn-warning" @onclick='() => ChangeStatus("Reserved")' disabled="@(mesa.estado == 2)">Reservada</button>
+                        <button class="btn btn-info" @onclick='() => ChangeStatus("Cleaning")' disabled="@(mesa.estado == 3)">Limpieza</button>
                     </div>
                 }
                 else
@@ -34,15 +34,16 @@
 @code {
     [Parameter] public Mesa? mesa { get; set; }
     [Parameter] public EventCallback CloseModalCallback { get; set; }
+    [Parameter] public EventCallback<Mesa> OnMesaUpdated { get; set; }
 
     private async Task ChangeStatus(string newStatus)
     {
         int valorEstado = newStatus switch
         {
-            "Available" => 1,
-            "Occupied" => 2,
-            "Reserved" => 3,
-            "Cleaning" => 4,
+            "Available" => 0,
+            "Occupied" => 1,
+            "Reserved" => 2,
+            "Cleaning" => 3,
             _ => 0
         };
 
@@ -50,9 +51,18 @@
         {
             mesa.estado = valorEstado;
             // Aquí podrías notificar cambios al componente padre si es necesario.
-            await Task.CompletedTask;
+            await OnMesaUpdated.InvokeAsync(mesa);
         }
     }
+
+    private string GetTableStatusClass(Mesa mesa) => mesa.estado switch
+    {
+        0 => "Disponible",
+        1 => "Ocupado",
+        2 => "Reservada",
+        3 => "Limpieza",
+        _ => "unknown"
+    };
 
     private async Task CloseModal()
     {
