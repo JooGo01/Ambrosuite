@@ -1,0 +1,79 @@
+@page "/pedido/{pedidoId:int}"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.Web.ServicesWeb
+@inject PedidosService PedidoService
+@inject PedidoDetalleService DetallePedidoService
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter] public int pedidoId { get; set; }
+    private Pedido? pedido;
+    private List<PedidoDetalle>? detallesPedido;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pedido = await PedidoService.GetPedidoByIdAsync(pedidoId);
+        detallesPedido = await DetallePedidoService.GetDetallePedidoByIdAsync(pedidoId);
+    }
+
+    private string estadoActualDePedido(Pedido pedido) => pedido.estado switch
+    {
+        0 => "Pendiente",
+        1 => "En Proceso",
+        2 => "Completado",
+        3 => "Cancelado",
+        _ => "Desconocido"
+    };
+}
+
+@if (pedido == null)
+{
+    <p>Cargando...</p>
+}
+else
+{
+    <div class="invoice-container">
+        <div class="invoice-header">
+            <h2>Pedido</h2>
+        </div>
+        <div class="invoice-details">
+            <p><strong>Fecha y Hora:</strong> @pedido.fecha_hora?.ToString("dd/MM/yyyy HH:mm")</p>
+            <p><strong>Total:</strong> @pedido.total?.ToString("C")</p>
+            <p><strong>Estado:</strong> @estadoActualDePedido(pedido)</p>
+            <p><strong>Usuario:</strong> @pedido.usuario.nombre @pedido.usuario.apellido</p>
+        </div>
+        <h3>Detalles del Pedido</h3>
+        @if (detallesPedido != null)
+        {
+            <table class="invoice-items">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var detalle in detallesPedido)
+                    {
+                        <tr>
+                            <td>@detalle.producto.nombre</td>
+                            <td>@detalle.cantidad</td>
+                            <td>@detalle.producto.precio?.ToString("C")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No se encuentran productos en el pedido seleccionado</p>
+        }
+        <div class="invoice-total">
+            <p>Total: @pedido.total?.ToString("C")</p>
+        </div>
+        <div class="invoice-footer">
+            <button class="btn btn-secondary" @onclick='() => Navigation.NavigateTo("/ambrosuite")'>Volver</button>
+        </div>
+    </div>
+}

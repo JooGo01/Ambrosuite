@@ -1,4 +1,7 @@
 @using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics
+@inject PedidosService PedidoService
 
 <div class="modal fade @(mesa != null ? "show" : "")" style="@(mesa != null ? "display: block;" : "display: none; background: rgba(0, 0, 0, 0.5);")">
     <div class="modal-dialog">
@@ -12,6 +15,21 @@
                 {
                     <p><strong>ID:</strong> @mesa.id</p>
                     <p><strong>Estado:</strong> @GetTableStatusClass(mesa)</p>
+                    @if (pedidoEnCurso != null)
+                    {
+                        <div>
+                            <h6>Pedido en Curso</h6>
+                            <p><strong>Fecha y Hora:</strong> @pedidoEnCurso.fecha_hora?.ToString("dd/MM/yyyy HH:mm")</p>
+                            <p><strong>Total:</strong> @pedidoEnCurso.total?.ToString("C")</p>
+                            <p><strong>Estado:</strong> @estadoActualDePedido(pedidoEnCurso)</p>
+                            <p><strong>Usuario:</strong> @pedidoEnCurso.usuario.nombre @pedidoEnCurso.usuario.apellido</p>
+                            <NavLink class="btn btn-info" href="@($"/pedido/{pedidoEnCurso.id}")">Ver Detalle del Pedido</NavLink>
+                        </div>
+                    }
+                    else
+                    {
+                        <p>No hay pedido en curso</p>
+                    }
                     <div class="modal-actions">
                         <button class="btn btn-primary" @onclick='() => ChangeStatus("Available")' disabled="@(mesa.estado == 0)">Disponible</button>
                         <button class="btn btn-danger" @onclick='() => ChangeStatus("Occupied")' disabled="@(mesa.estado == 1)">Ocupada</button>
@@ -35,6 +53,27 @@
     [Parameter] public Mesa? mesa { get; set; }
     [Parameter] public EventCallback CloseModalCallback { get; set; }
     [Parameter] public EventCallback<Mesa> OnMesaUpdated { get; set; }
+
+    private Pedido? pedidoEnCurso;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (mesa != null)
+        {
+            Debug.WriteLine($"Buscando ultimo pedido: {mesa.id}");
+            var pedidos = await PedidoService.GetPedidosByMesaAsync(mesa.id);
+            pedidoEnCurso = pedidos.FirstOrDefault();
+        }
+    }
+
+    private string estadoActualDePedido(Pedido pedido) => pedido.estado switch
+    {
+        0 => "Pendiente",
+        1 => "En Proceso",
+        2 => "Completado",
+        3 => "Cancelado",
+        _ => "Desconocido"
+    };
 
     private async Task ChangeStatus(string newStatus)
     {

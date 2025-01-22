@@ -18,6 +18,15 @@ builder.Services.AddHttpClient<MesasService>(client =>
     client.BaseAddress = new Uri("https://localhost:5001"); // Asegúrate de que la URL sea correcta
 });
 
+builder.Services.AddHttpClient<PedidosService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001"); // Asegúrate de que la URL sea correcta
+});
+
+builder.Services.AddHttpClient<PedidoDetalleService>(client =>
+{
+    client.BaseAddress = new Uri("https://localhost:5001"); // Asegúrate de que la URL sea correcta
+});
 
 // Configura Kestrel para escuchar en los puertos deseados
 //builder.WebHost.UseUrls("https://localhost:2215", "http://localhost:2216");
