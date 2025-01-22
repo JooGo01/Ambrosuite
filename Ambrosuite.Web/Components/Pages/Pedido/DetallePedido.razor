@@ -1,9 +1,12 @@
 @page "/pedido/{pedidoId:int}"
 @using Ambrosuite.ApiService.Entities
 @using Ambrosuite.Web.ServicesWeb
+@using System.Diagnostics
 @inject PedidosService PedidoService
 @inject PedidoDetalleService DetallePedidoService
 @inject NavigationManager Navigation
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
 
 @code {
     [Parameter] public int pedidoId { get; set; }
@@ -24,6 +27,13 @@
         3 => "Cancelado",
         _ => "Desconocido"
     };
+
+    private async Task ImprimirFactura()
+    {
+        Debug.WriteLine("imprimir factura");
+        await JSRuntime.InvokeVoidAsync("printInvoice");
+        Debug.WriteLine("termino imprimir factura");
+    }
 }
 
 @if (pedido == null)
@@ -32,7 +42,7 @@
 }
 else
 {
-    <div class="invoice-container">
+    <div class="invoice-container printable-area">
         <div class="invoice-header">
             <h2>Pedido</h2>
         </div>
@@ -72,8 +82,10 @@ else
         <div class="invoice-total">
             <p>Total: @pedido.total?.ToString("C")</p>
         </div>
-        <div class="invoice-footer">
+        <div class="invoice-footer  no-print">
             <button class="btn btn-secondary" @onclick='() => Navigation.NavigateTo("/ambrosuite")'>Volver</button>
+            <button class="btn btn-primary" @onclick="ImprimirFactura">Imprimir</button>
         </div>
     </div>
 }
+
