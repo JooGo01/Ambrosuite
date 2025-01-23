@@ -1,0 +1,56 @@
+﻿@page "/abm"
+@using Ambrosuite.Web.ServicesWeb
+@using Ambrosuite.ApiService.Entities;
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Panel de administración</PageTitle>
+
+<div class="layout-container">
+    <div class="main-content">
+        <div class="top-bar">
+            <h1>Gestión de Objetos</h1>
+        </div>
+
+        <div class="items-grid">
+            @foreach (var item in GetItems())
+            {
+                <div class="item-card" @onclick="() => NavigateToPage(item.Page)">
+                    <div class="item-icon">
+                        <img src="@item.Icon" alt="@item.Name" />
+                    </div>
+                    <div class="item-name">
+                        <span>@item.Name</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Item> GetItems() => new()
+    {
+        new Item { Name = "Personal", Icon = "icono/personal.png", Page = "/abm/personal" },
+        new Item { Name = "Rol", Icon = "icono/rol.png", Page = "/abm/rol" },
+        new Item { Name = "Receta", Icon = "icono/receta.png", Page = "/abm/receta" },
+        new Item { Name = "Inventario", Icon = "icono/inventario.png", Page = "/abm/inventario" },
+        new Item { Name = "Ingrediente", Icon = "icono/ingrediente.png", Page = "/abm/ingrediente" },
+        new Item { Name = "Productos", Icon = "icono/producto.png", Page = "/abm/productos" },
+        new Item { Name = "Categoría (Producto)", Icon = "icono/categoria_producto.png", Page = "/abm/categoriaproducto" },
+        new Item { Name = "Categoría (Gasto)", Icon = "icono/categoria_gasto.png", Page = "/abm/categoriagasto" },
+        new Item { Name = "Mesa", Icon = "icono/mesa.png", Page = "/abm/mesa" }
+    };
+
+    private void NavigateToPage(string page)
+    {
+        Navigation.NavigateTo(page);
+    }
+
+    private class Item
+    {
+        public string Name { get; set; }
+        public string Icon { get; set; }
+        public string Page { get; set; }
+    }
+}
