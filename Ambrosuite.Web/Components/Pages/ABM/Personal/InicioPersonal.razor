@@ -3,6 +3,8 @@
 @using Ambrosuite.Web.ServicesWeb;
 @using System.Diagnostics;
 @inject UsuariosService PersonalService
+@inject RolesService RolService
+@rendermode InteractiveServer
 
 <h3>Gestión de Personal</h3>
 
@@ -10,7 +12,6 @@
 
 @if (mostrarFormulario)
 {
-    @*
     <EditForm Model="personal" OnValidSubmit="GuardarPersonal">
         <DataAnnotationsValidator />
         <ValidationSummary />
@@ -23,10 +24,34 @@
             <label for="apellido">Apellido</label>
             <InputText id="apellido" class="form-control" @bind-Value="personal.apellido" />
         </div>
+        <div class="form-group">
+            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+            <InputDate id="fecha_nacimiento" class="form-control" @bind-Value="personal.fecha_nacimiento" />
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <InputText id="email" class="form-control" @bind-Value="personal.email" />
+        </div>
+        <div class="form-group">
+            <label for="cuil">CUIL</label>
+            <InputText id="cuil" class="form-control" @bind-Value="personal.cuil" />
+        </div>
+        <div class="form-group">
+            <label for="contrasenia">Contraseña</label>
+            <InputText id="contrasenia" type="password" class="form-control" @bind-Value="personal.contrasenia" />
+        </div>
+        <div class="form-group">
+            <label for="rol_id">Rol</label>
+            <InputSelect id="rol_id" class="form-control" @bind-Value="personal.rol_id">
+                @foreach (var rol in roles)
+                {
+                    <option value="@rol.id">@rol.nombre_rol</option>
+                }
+            </InputSelect>
+        </div>
         <button type="submit" class="btn btn-success">Guardar</button>
         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
     </EditForm>
-    *@
 }
 
 <table class="table">
@@ -54,16 +79,28 @@
 
 @code {
     private List<Usuario> listaUsuario = new();
+    private List<Rol> roles = new();
     private bool isLoading = true;
     private bool isVisible = false;
     private string? error;
-    // private Usuario personal = new Usuario();
+    private Usuario personal = new Usuario
+        {
+            nombre = string.Empty,
+            apellido = string.Empty,
+            fecha_nacimiento = DateTime.Now,
+            email = string.Empty,
+            cuil = string.Empty,
+            contrasenia = string.Empty,
+            baja = 0,
+            rol_id = 0
+        };
     private bool mostrarFormulario = false;
     private bool esNuevoRegistro = true;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadUsuarios();
+        await LoadRoles();
     }
 
     private async Task LoadUsuarios()
@@ -84,30 +121,59 @@
         }
     }
 
+    private async Task LoadRoles()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            roles = await RolService.GetRolesAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los roles: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
 
     private void MostrarFormularioAgregar()
     {
-        // personal = new Usuario();
+        personal = new Usuario
+            {
+                nombre = string.Empty,
+                apellido = string.Empty,
+                fecha_nacimiento = DateTime.Now,
+                email = string.Empty,
+                cuil = string.Empty,
+                contrasenia = string.Empty,
+                baja = 0,
+                rol_id = 0
+            };
         esNuevoRegistro = true;
         mostrarFormulario = true;
     }
 
     private void MostrarFormularioModificar(Usuario persona)
     {
-        // personal = persona;
+        personal = persona;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
     private async Task GuardarPersonal()
     {
+        personal.baja = 0; // Asegurarse de que el campo baja siempre sea 0
+
         if (esNuevoRegistro)
         {
-            // await PersonalService.(personal);
+            await PersonalService.agregarUsuarioAsync(personal);
         }
         else
         {
-            // await PersonalService.updateUsuarioAsync(personal);
+            await PersonalService.modificarUsuarioAsync(personal);
         }
         listaUsuario = await PersonalService.GetUsuariosAsync();
         mostrarFormulario = false;

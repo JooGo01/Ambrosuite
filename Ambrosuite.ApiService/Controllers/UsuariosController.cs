@@ -59,12 +59,22 @@ namespace Ambrosuite.ApiService.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<List<Usuario>>> GetAllUsuarios() {
+        public async Task<ActionResult<List<Usuario>>> GetAllUsuariosActivos() {
+            //var usuarios = await _context.Usuarios.ToListAsync();
+            var usuarios = await _context.Usuarios.Include(u => u.Rol).Where(p => p.baja== 0).ToListAsync();
+            var usuariosDto = _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
+            return Ok(usuariosDto);
+        }
+
+        [HttpGet("todos")]
+        public async Task<ActionResult<List<Usuario>>> GetAllUsuarios()
+        {
             //var usuarios = await _context.Usuarios.ToListAsync();
             var usuarios = await _context.Usuarios.Include(u => u.Rol).ToListAsync();
             var usuariosDto = _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
             return Ok(usuariosDto);
         }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<List<Usuario>>> GetUsuario(int id)
         {
