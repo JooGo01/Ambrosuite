@@ -139,8 +139,7 @@
     private IEnumerable<Mesa> FilteredTables()
     {
         return tables.Where(t => string.IsNullOrWhiteSpace(searchQuery)
-                                 || t.id.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase)
-                                 || t.estado.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
+                                 || t.id.ToString().Contains(searchQuery, StringComparison.OrdinalIgnoreCase));
     }
 
     private void CloseModal()

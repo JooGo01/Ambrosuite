@@ -1,0 +1,126 @@
+﻿@page "/abm/personal"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject UsuariosService PersonalService
+
+<h3>Gestión de Personal</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Personal</button>
+
+@if (mostrarFormulario)
+{
+    @*
+    <EditForm Model="personal" OnValidSubmit="GuardarPersonal">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <InputText id="nombre" class="form-control" @bind-Value="personal.nombre" />
+        </div>
+        <div class="form-group">
+            <label for="apellido">Apellido</label>
+            <InputText id="apellido" class="form-control" @bind-Value="personal.apellido" />
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+    *@
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Apellido</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var persona in listaUsuario)
+        {
+            <tr>
+                <td>@persona.nombre</td>
+                <td>@persona.apellido</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(persona)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarPersonal(persona)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<Usuario> listaUsuario = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    // private Usuario personal = new Usuario();
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadUsuarios();
+    }
+
+    private async Task LoadUsuarios()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaUsuario = await PersonalService.GetUsuariosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los usuarios: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+
+    private void MostrarFormularioAgregar()
+    {
+        // personal = new Usuario();
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(Usuario persona)
+    {
+        // personal = persona;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarPersonal()
+    {
+        if (esNuevoRegistro)
+        {
+            // await PersonalService.(personal);
+        }
+        else
+        {
+            // await PersonalService.updateUsuarioAsync(personal);
+        }
+        listaUsuario = await PersonalService.GetUsuariosAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarPersonal(Usuario p_usuario)
+    {
+        await PersonalService.deleteUsuarioAsync(p_usuario);
+        listaUsuario = await PersonalService.GetUsuariosAsync();
+    }
+}
