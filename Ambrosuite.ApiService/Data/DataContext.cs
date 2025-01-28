@@ -18,8 +18,9 @@ namespace Ambrosuite.ApiService.Data
         public DbSet<PedidoDetalle> PedidoDetalles { get; set; }
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<Mesa> Mesas { get; set; }
-
         public DbSet<CategoriaGasto> CategoriaGastos { get; set; }
+        public DbSet<Gasto> Gastos { get; set; }
+        public DbSet<Caja> Cajas { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
