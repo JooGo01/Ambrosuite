@@ -9,7 +9,7 @@ namespace Ambrosuite.ApiService.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class GastosController : Controller
+    public class GastosController : ControllerBase
     {
         private readonly DataContext _context;
         private readonly IMapper _mapper;

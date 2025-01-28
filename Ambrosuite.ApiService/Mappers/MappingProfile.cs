@@ -70,10 +70,16 @@ namespace Ambrosuite.ApiService.Mappers
 
             // Gasto
             CreateMap<Gasto, GastoDTO>()
-                .ForMember(dest => dest.caja_id, opt => opt.MapFrom(src => src.mesa.id))
+                .ForMember(dest => dest.caja_id, opt => opt.MapFrom(src => src.caja.id))
                 .ForMember(dest => dest.usuario_id, opt => opt.MapFrom(src => src.usuario.id))
                 .ForMember(dest => dest.categoria_gasto_id, opt => opt.MapFrom(src => src.categoria_gasto.id));
             CreateMap<GastoCreateUpdateDTO, Gasto>();
+
+            //CajaPedido
+            CreateMap<CajaPedido, CajaPedidoDTO>()
+                .ForMember(dest => dest.caja_id, opt => opt.MapFrom(src => src.caja.id))
+                .ForMember(dest => dest.pedido_id, opt => opt.MapFrom(src => src.pedido.id));
+            CreateMap<CajaPedidoCreateUpdateDTO, CajaPedido>();
         }
 
         public class ListTypeConverter<TSource, TDestination> : ITypeConverter<List<TSource>, List<TDestination>>
