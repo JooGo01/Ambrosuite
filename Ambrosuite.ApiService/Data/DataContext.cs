@@ -21,8 +21,8 @@ namespace Ambrosuite.ApiService.Data
         public DbSet<CategoriaGasto> CategoriaGastos { get; set; }
         public DbSet<Gasto> Gastos { get; set; }
         public DbSet<Caja> Cajas { get; set; }
-
         public DbSet<CajaPedido> CajaPedidos { get; set; }
+        public DbSet<CajaMovimiento> CajaMovimientos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -79,6 +79,26 @@ namespace Ambrosuite.ApiService.Data
                 .HasOne(g => g.caja)
                 .WithMany()
                 .HasForeignKey(g => g.caja_id);
+
+            modelBuilder.Entity<CajaPedido>()
+                .HasOne(cp => cp.caja)
+                .WithMany()
+                .HasForeignKey(cp => cp.caja_id);
+
+            modelBuilder.Entity<CajaPedido>()
+                .HasOne(cp => cp.pedido)
+                .WithMany()
+                .HasForeignKey(cp => cp.pedido_id);
+
+            modelBuilder.Entity<CajaMovimiento>()
+                .HasOne(cm => cm.caja)
+                .WithMany()
+                .HasForeignKey(cm => cm.caja_id);
+
+            modelBuilder.Entity<CajaMovimiento>()
+                .HasOne(cm => cm.usuario)
+                .WithMany()
+                .HasForeignKey(cm => cm.usuario_id);
 
             base.OnModelCreating(modelBuilder);
         }
