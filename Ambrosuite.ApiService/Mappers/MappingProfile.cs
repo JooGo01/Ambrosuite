@@ -59,6 +59,10 @@ namespace Ambrosuite.ApiService.Mappers
                 .ForMember(dest => dest.pedido_id, opt => opt.MapFrom(src => src.pedido.id));
             CreateMap<PedidoDetalleDTO, PedidoDetalle>();
             CreateMap<PedidoDetalleCreateUpdateDTO, PedidoDetalle>();
+
+            // Categoria Gasto
+            CreateMap<CategoriaGasto, CategoriaGastoDTO>();
+            CreateMap<CategoriaGastoCreateUpdateDTO, CategoriaGasto>();
         }
 
         public class ListTypeConverter<TSource, TDestination> : ITypeConverter<List<TSource>, List<TDestination>>
