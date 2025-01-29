@@ -23,6 +23,7 @@ namespace Ambrosuite.ApiService.Data
         public DbSet<Caja> Cajas { get; set; }
         public DbSet<CajaPedido> CajaPedidos { get; set; }
         public DbSet<CajaMovimiento> CajaMovimientos { get; set; }
+        public DbSet<MetodoPago> MetodoPagos { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
