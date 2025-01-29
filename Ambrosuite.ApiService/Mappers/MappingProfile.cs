@@ -90,6 +90,16 @@ namespace Ambrosuite.ApiService.Mappers
             //MetodoPago
             CreateMap<MetodoPago, MetodoPagoDTO>();
             CreateMap<MetodoPagoCreateUpdateDTO, MetodoPago>();
+
+            //TipoFactura
+            CreateMap<TipoFactura, TipoFacturaDTO>();
+            CreateMap<TipoFacturaCreateUpdateDTO, TipoFactura>();
+
+            //Inventario
+            CreateMap<Inventario, InventarioDTO>()
+                .ForMember(dest => dest.ingrediente_id, opt => opt.MapFrom(src => src.ingrediente.id));
+            CreateMap<InventarioCreateUpdateDTO, Inventario>();
+
         }
 
         public class ListTypeConverter<TSource, TDestination> : ITypeConverter<List<TSource>, List<TDestination>>
