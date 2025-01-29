@@ -25,6 +25,8 @@ namespace Ambrosuite.ApiService.Data
         public DbSet<CajaMovimiento> CajaMovimientos { get; set; }
         public DbSet<MetodoPago> MetodoPagos { get; set; }
 
+        public DbSet<TipoFactura> TipoFacturas { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Usuario>()
