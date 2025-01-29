@@ -26,7 +26,8 @@ namespace Ambrosuite.ApiService.Data
         public DbSet<MetodoPago> MetodoPagos { get; set; }
         public DbSet<TipoFactura> TipoFacturas { get; set; }
         public DbSet<Inventario> Inventarios { get; set; }
-
+        public DbSet<PedidoFacturacion> PedidoFacturaciones { get; set; }
+        public DbSet<Facturacion> Facturaciones { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +109,27 @@ namespace Ambrosuite.ApiService.Data
                 .HasOne(i => i.ingrediente)
                 .WithMany()
                 .HasForeignKey(i => i.ingrediente_id);
+
+            modelBuilder.Entity<PedidoFacturacion>()
+                .HasOne(pf => pf.pedido)
+                .WithMany()
+                .HasForeignKey(pf => pf.pedido_id);
+
+            modelBuilder.Entity<PedidoFacturacion>()
+                .HasOne(pf => pf.facturacion)
+                .WithMany()
+                .HasForeignKey(pf => pf.facturacion_id);
+
+
+            modelBuilder.Entity<Facturacion>()
+                .HasOne(f => f.metodoPago)
+                .WithMany()
+                .HasForeignKey(f => f.metodo_pago_id);
+
+            modelBuilder.Entity<Facturacion>()
+                .HasOne(f => f.tipoFactura)
+                .WithMany()
+                .HasForeignKey(f => f.tipo_factura_id);
 
             base.OnModelCreating(modelBuilder);
         }
