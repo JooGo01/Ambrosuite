@@ -41,6 +41,9 @@ namespace Ambrosuite.ApiService.Data
             modelBuilder.Entity<Receta>()
             .HasKey(r => new { r.id, r.productoFinalId, r.ingredienteId });
 
+            modelBuilder.Entity<PedidoFacturacion>()
+                .HasKey(pf => new { pf.pedido_id, pf.facturacion_id });
+
             modelBuilder.Entity<Receta>()
                 .HasOne(r => r.productoFinal)
                 .WithMany(p => p.recetas)
@@ -107,7 +110,7 @@ namespace Ambrosuite.ApiService.Data
                 .WithMany()
                 .HasForeignKey(cm => cm.usuario_id);
 
-            modelBuilder.Entity<Inventario>()
+           modelBuilder.Entity<Inventario>()
                 .HasOne(i => i.ingrediente)
                 .WithMany()
                 .HasForeignKey(i => i.ingrediente_id);

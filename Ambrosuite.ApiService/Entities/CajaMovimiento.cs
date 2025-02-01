@@ -2,7 +2,7 @@
 
 namespace Ambrosuite.ApiService.Entities
 {
-    [Table("caja_pedido")]
+    [Table("caja_movimiento")]
     public class CajaMovimiento
     {
         public int id { get; set; }

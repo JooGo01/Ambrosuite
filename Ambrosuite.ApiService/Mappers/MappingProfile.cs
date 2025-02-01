@@ -68,6 +68,7 @@ namespace Ambrosuite.ApiService.Mappers
             CreateMap<Caja, CajaDTO>();
             CreateMap<CajaCreateUpdateDTO, Caja>();
 
+            
             // Gasto
             CreateMap<Gasto, GastoDTO>()
                 .ForMember(dest => dest.caja_id, opt => opt.MapFrom(src => src.caja.id))
@@ -81,6 +82,7 @@ namespace Ambrosuite.ApiService.Mappers
                 .ForMember(dest => dest.pedido_id, opt => opt.MapFrom(src => src.pedido.id));
             CreateMap<CajaPedidoCreateUpdateDTO, CajaPedido>();
 
+            
             // CajaMovimiento
             CreateMap<CajaMovimiento, CajaMovimientoDTO>()
                 .ForMember(dest => dest.caja_id, opt => opt.MapFrom(src => src.caja.id))
