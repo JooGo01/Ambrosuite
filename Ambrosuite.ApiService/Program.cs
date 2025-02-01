@@ -11,8 +11,6 @@ using System.IdentityModel.Tokens.Jwt;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 
-
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
@@ -24,13 +22,6 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
-/*
-builder.WebHost.ConfigureKestrel(options =>
-{
-    options.ListenAnyIP(2215, listenOptions => listenOptions.UseHttps());  // HTTPS en el puerto 2215
-    options.ListenAnyIP(2216);  // HTTP en el puerto 2216
-});
-*/
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost",
@@ -38,7 +29,6 @@ builder.Services.AddCors(options =>
                           .AllowAnyHeader()
                           .AllowAnyMethod());
 });
-
 
 // Add service defaults & Aspire components.
 builder.AddServiceDefaults();
@@ -49,9 +39,10 @@ builder.Services.AddProblemDetails();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddSingleton<ITokenService, TokenService>();
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");

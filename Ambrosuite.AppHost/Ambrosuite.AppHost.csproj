@@ -11,6 +11,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ambrosuite.ApiService\Ambrosuite.ApiService.csproj" />
+    <ProjectReference Include="..\Ambrosuite.ServiceDefaults\Ambrosuite.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Ambrosuite.Web\Ambrosuite.Web.csproj" />
   </ItemGroup>
 
