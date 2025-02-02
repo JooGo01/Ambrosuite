@@ -31,13 +31,13 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoriaGastoDTO>> GetCategoriaGasto(int id)
         {
-            var mesa = await _context.Mesas.FindAsync(id);
-            if (mesa == null)
+            var categoriaGasto = await _context.CategoriaGastos.FindAsync(id);
+            if (categoriaGasto == null)
             {
                 return NotFound("Categoria Gasto no encontrada");
             }
-            var mesaDto = _mapper.Map<MesaDTO>(mesa);
-            return Ok(mesaDto);
+            var categoriaGastoDto = _mapper.Map<CategoriaGastoDTO>(categoriaGasto);
+            return Ok(categoriaGastoDto);
         }
 
         [HttpPost]

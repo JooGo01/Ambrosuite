@@ -64,6 +64,16 @@ namespace Ambrosuite.ApiService.Mappers
             CreateMap<CategoriaGasto, CategoriaGastoDTO>();
             CreateMap<CategoriaGastoCreateUpdateDTO, CategoriaGasto>();
 
+            // Categoria Producto
+            CreateMap<CategoriaProducto, CategoriaProductoDTO>()
+                .ForMember(dest=>dest.producto_id, opt=> opt.MapFrom(src => src.producto_id))
+                .ForMember(dest=>dest.categoria_id, opt => opt.MapFrom(src => src.categoria_id));
+            CreateMap<CategoriaProductoCreateUpdateDTO, CategoriaProducto>();
+
+            //Categoria
+            CreateMap<Categoria, CategoriaDTO>();
+            CreateMap<CategoriaCreateUpdateDTO, Categoria>();
+
             // Caja
             CreateMap<Caja, CajaDTO>();
             CreateMap<CajaCreateUpdateDTO, Caja>();

@@ -19,6 +19,8 @@ namespace Ambrosuite.ApiService.Data
         public DbSet<Pedido> Pedidos { get; set; }
         public DbSet<Mesa> Mesas { get; set; }
         public DbSet<CategoriaGasto> CategoriaGastos { get; set; }
+        public DbSet<Categoria> Categorias { get; set; }
+        public DbSet<CategoriaProducto> CategoriaProductos { get; set; }
         public DbSet<Gasto> Gastos { get; set; }
         public DbSet<Caja> Cajas { get; set; }
         public DbSet<CajaPedido> CajaPedidos { get; set; }
@@ -99,6 +101,16 @@ namespace Ambrosuite.ApiService.Data
                 .HasOne(cp => cp.pedido)
                 .WithMany()
                 .HasForeignKey(cp => cp.pedido_id);
+
+            modelBuilder.Entity<CategoriaProducto>()
+                .HasOne(cp=>cp.categoria)
+                .WithMany()
+                .HasForeignKey(cp=>cp.categoria_id);
+
+            modelBuilder.Entity<CategoriaProducto>()
+                .HasOne(cp => cp.producto)
+                .WithMany()
+                .HasForeignKey(cp => cp.producto_id);
 
             modelBuilder.Entity<CajaMovimiento>()
                 .HasOne(cm => cm.caja)
