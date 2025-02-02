@@ -45,7 +45,12 @@ builder.Services.AddHttpClient<CategoriaGastosService>(client =>
     client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
 });
 
-builder.Services.AddHttpClient<CategoriaGastosService>(client =>
+builder.Services.AddHttpClient<CategoriaProductosService>(client =>
+{
+    client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
+});
+
+builder.Services.AddHttpClient<CategoriasService>(client =>
 {
     client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
 });

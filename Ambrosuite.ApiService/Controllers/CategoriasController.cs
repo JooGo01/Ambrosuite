@@ -21,6 +21,14 @@ namespace Ambrosuite.ApiService.Controllers
         }
 
         [HttpGet]
+        public async Task<ActionResult<List<CategoriaDTO>>> GetAllCategoriaActivos()
+        {
+            var categoria = await _context.Categorias.Where(p => p.estado == 0).ToListAsync();
+            var categoriasDto = _mapper.Map<IEnumerable<CategoriaDTO>>(categoria);
+            return Ok(categoriasDto);
+        }
+
+        [HttpGet("todos")]
         public async Task<ActionResult<List<CategoriaDTO>>> GetAllCategoria()
         {
             var categoria= await _context.Categorias.ToListAsync();

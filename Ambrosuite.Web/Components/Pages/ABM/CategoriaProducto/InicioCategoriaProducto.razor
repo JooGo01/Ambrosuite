@@ -1,5 +1,133 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/categoriaproducto"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject CategoriasService CategoriaService
+@rendermode InteractiveServer
+
+<h3>Gestión de Categoria Producto</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Producto</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="categoria" OnValidSubmit="GuardarCategoria">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="nombre">Nombre Categoria</label>
+            <InputText id="nombre" class="form-control" @bind-Value="categoria.nombre" />
+        </div>
+
+        <div class="form-group">
+            <input value="0" id="estado" name="estado" type="hidden"/>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var categoria in listaCategoria)
+        {
+            <tr>
+                <td>@categoria.nombre</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoria)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarCategoria(categoria)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<Categoria> listaCategoria = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private Categoria categoria = new Categoria
+        {
+            nombre = string.Empty,
+            estado = 0
+        };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategoria();
+    }
+
+    private async Task LoadCategoria()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaCategoria = await CategoriaService.GetCategoriaAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los roles: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        categoria = new Categoria
+            {
+                nombre = string.Empty,
+                estado = 0
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(Categoria p_categoria)
+    {
+        categoria = p_categoria;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarCategoria()
+    {
+        if (esNuevoRegistro)
+        {
+            await CategoriaService.agregarCategoriaAsync(categoria);
+        }
+        else
+        {
+            await CategoriaService.updateCategoriaAsync(categoria);
+        }
+        listaCategoria = await CategoriaService.GetCategoriaAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarCategoria(Categoria p_categoria)
+    {
+        await CategoriaService.deleteCategoriaAsync(p_categoria);
+        listaCategoria = await CategoriaService.GetCategoriaAsync();
+    }
 }
