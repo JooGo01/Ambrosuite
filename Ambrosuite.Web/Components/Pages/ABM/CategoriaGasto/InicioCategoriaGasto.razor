@@ -1,1 +1,132 @@
-﻿
+﻿@page "/abm/categoriagasto"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject CategoriaGastosService CategoriaGService
+@rendermode InteractiveServer
+
+<h3>Gestión de Categoria Gasto</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Gasto</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="categoriaGasto" OnValidSubmit="GuardarCategoriaGasto">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="nombre">Nombre Gasto</label>
+            <InputText id="nombre" class="form-control" @bind-Value="categoriaGasto.gasto_nombre" />
+        </div>
+        <div class="form-group">
+            <label for="descripcion_rol">Descripcion Gasto</label>
+            <InputText id="descripcion_rol" class="form-control" @bind-Value="categoriaGasto.gasto_descripcion" />
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var categoriaGasto in listaCategoriaGasto)
+        {
+            <tr>
+                <td>@categoriaGasto.gasto_nombre</td>
+                <td>@categoriaGasto.gasto_descripcion</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoriaGasto)">Modificar</button>
+                    @* <button class="btn btn-danger" @onclick="() => EliminarRol(role)">Eliminar</button> *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<CategoriaGasto> listaCategoriaGasto = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private CategoriaGasto categoriaGasto = new CategoriaGasto
+        {
+            gasto_nombre = string.Empty,
+            gasto_descripcion = string.Empty
+        };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategoriaGasto();
+    }
+
+    private async Task LoadCategoriaGasto()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaCategoriaGasto = await CategoriaGService.GetCategoriaGastosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los roles: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        categoriaGasto = new CategoriaGasto
+            {
+                gasto_nombre = string.Empty,
+                gasto_descripcion = string.Empty
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(CategoriaGasto p_categoriagasto)
+    {
+        categoriaGasto = p_categoriagasto;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarCategoriaGasto()
+    {
+        if (esNuevoRegistro)
+        {
+            await CategoriaGService.agregarCategoriaGastosAsync(categoriaGasto);
+        }
+        else
+        {
+            await CategoriaGService.updateCategoriaGastoAsync(categoriaGasto);
+        }
+        listaCategoriaGasto = await CategoriaGService.GetCategoriaGastosAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarCategoriaGasto(CategoriaGasto p_categoriagasto)
+    {
+        // await CategoriaGasto.(p_categoriagasto);
+        // listaRol = await RolService.GetRolesAsync();
+    }
+}
