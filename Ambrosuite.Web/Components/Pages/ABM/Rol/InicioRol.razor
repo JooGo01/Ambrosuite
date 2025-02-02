@@ -1,5 +1,132 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/rol"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject RolesService RolService
+@rendermode InteractiveServer
+
+<h3>Gestión de Rol</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Rol</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="rol" OnValidSubmit="GuardarRol">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="nombre">Nombre Rol</label>
+            <InputText id="nombre" class="form-control" @bind-Value="rol.nombre_rol" />
+        </div>
+        <div class="form-group">
+            <label for="descripcion_rol">Descripcion Rol</label>
+            <InputText id="descripcion_rol" class="form-control" @bind-Value="rol.descripcion_rol" />
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var role in listaRol)
+        {
+            <tr>
+                <td>@role.nombre_rol</td>
+                <td>@role.descripcion_rol</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(role)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarRol(role)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<Rol> listaRol= new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private Rol rol = new Rol
+        {
+            descripcion_rol=string.Empty,
+            nombre_rol = string.Empty
+        };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadRoles();
+    }
+
+    private async Task LoadRoles()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaRol = await RolService.GetRolesAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los roles: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        rol = new Rol
+            {
+                descripcion_rol = string.Empty,
+                nombre_rol = string.Empty
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(Rol p_rol)
+    {
+        rol = p_rol;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarRol()
+    {
+        if (esNuevoRegistro)
+        {
+            await RolService.agregarRolAsync(rol);
+        }
+        else
+        {
+            await RolService.updateRolAsync(rol);
+        }
+        listaRol = await RolService.GetRolesAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarRol(Rol p_rol)
+    {
+        await RolService.deleteRolAsync(p_rol);
+        listaRol = await RolService.GetRolesAsync();
+    }
 }

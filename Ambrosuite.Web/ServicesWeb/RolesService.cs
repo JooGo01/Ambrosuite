@@ -1,6 +1,7 @@
 ﻿using Ambrosuite.ApiService.Entities;
 using Ambrosuite.ApiService.EntitiesDTO;
 using System.Diagnostics;
+using System.Text;
 
 namespace Ambrosuite.Web.ServicesWeb
 {
@@ -62,6 +63,27 @@ namespace Ambrosuite.Web.ServicesWeb
             catch (Exception ex)
             {
                 Console.WriteLine($"Error deleting table: {ex.Message}");
+                throw;
+            }
+        }
+
+        public async Task agregarRolAsync(Rol p_rol)
+        {
+            try
+            {
+                RolCreateUpdateDTO rol = new RolCreateUpdateDTO
+                {
+                    nombre_rol = p_rol.nombre_rol,
+                    descripcion_rol = p_rol.descripcion_rol
+                };
+
+                var response = await _httpClient.PostAsJsonAsync("/api/Roles", rol);
+                Debug.WriteLine(response);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error adding table: {ex.Message}");
                 throw;
             }
         }
