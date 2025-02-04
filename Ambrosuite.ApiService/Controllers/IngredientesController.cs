@@ -19,7 +19,15 @@ namespace Ambrosuite.ApiService.Controllers
             _context = context;
             _mapper = mapper;
         }
+
         [HttpGet]
+        public async Task<ActionResult<List<Ingrediente>>> GetAllIngredientesActivos()
+        {
+            var ingredientes = await _context.Ingredientes.Where(p => p.estado== 0).ToListAsync();
+            return Ok(ingredientes);
+        }
+
+        [HttpGet("todos")]
         public async Task<ActionResult<List<Ingrediente>>> GetAllIngredientes()
         {
             var ingredientes = await _context.Ingredientes.ToListAsync();

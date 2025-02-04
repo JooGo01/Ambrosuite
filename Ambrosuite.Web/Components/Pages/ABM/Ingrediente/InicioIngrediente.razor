@@ -1,5 +1,150 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/ingrediente"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject IngredientesService IngredienteService
+@rendermode InteractiveServer
+
+<h3>Gestión de Ingredientes</h3>
+
+<button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Ingrediente</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="ingrediente" OnValidSubmit="GuardarIngrediente">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <InputText id="nombre" class="form-control" @bind-Value="ingrediente.nombre" />
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripcion</label>
+            <InputText id="descripcion" class="form-control" @bind-Value="ingrediente.descripcion" />
+        </div>
+        <div class="form-group">
+            <label for="marca">Marca</label>
+            <InputText id="marca" class="form-control" @bind-Value="ingrediente.marca" />
+        </div>
+        <div class="form-group">
+            <label for="alertaCantidad">Alerta Cantidad</label>
+            <InputNumber id="alertaCantidad" class="form-control" @bind-Value="ingrediente.alertaCantidad" />
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Marca</th>
+            <th>Alerta Cantidad</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var ing in listaIngrediente)
+        {
+            <tr>
+                <td>@ing.nombre</td>
+                <td>@ing.descripcion</td>
+                <td>@ing.marca</td>
+                <td>@ing.alertaCantidad</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(ing)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarIngrediente(ing)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<Ingrediente> listaIngrediente = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private Ingrediente ingrediente = new Ingrediente
+		{
+			nombre = string.Empty,
+			descripcion = string.Empty,
+			marca = string.Empty,
+            alertaCantidad=0,
+            estado=0
+		};
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadIngredientes();
+    }
+
+    private async Task LoadIngredientes()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaIngrediente = await IngredienteService.GetIngredienteAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los ingredientes: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        ingrediente = new Ingrediente
+        {
+            nombre = string.Empty,
+            descripcion = string.Empty,
+            marca = string.Empty,
+            alertaCantidad = 0,
+            estado = 0
+        };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(Ingrediente p_ingrediente)
+    {
+        ingrediente = p_ingrediente;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarIngrediente()
+    {
+        if (esNuevoRegistro)
+        {
+            await IngredienteService.agregarIngredienteAsync(ingrediente);
+        }
+        else
+        {
+            await IngredienteService.updateIngredienteAsync(ingrediente);
+        }
+        listaIngrediente = await IngredienteService.GetIngredienteAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarIngrediente(Ingrediente p_ingrediente)
+    {
+        await IngredienteService.deleteIngredienteAsync(p_ingrediente);
+        listaIngrediente = await IngredienteService.GetIngredienteAsync();
+    }
 }
