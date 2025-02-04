@@ -28,6 +28,42 @@ namespace Ambrosuite.ApiService.Controllers
             return Ok(categoriasProductoDto);
         }
 
+        [HttpGet("{id}")]
+        public async Task<ActionResult<CategoriaProductoDTO>> GetCategoriaProductoById(int id)
+        {
+            var categoriaProducto = await _context.CategoriaProductos.FindAsync(id);
+            if (categoriaProducto == null)
+            {
+                return NotFound("Categoria Producto no encontrada");
+            }
+            var categoriaProductoDto = _mapper.Map<CategoriaProductoDTO>(categoriaProducto);
+            return Ok(categoriaProductoDto);
+        }
+
+        [HttpGet("producto/{id}")]
+        public async Task<ActionResult<List<CategoriaProductoDTO>>> GetCategoriaProductoByProductoId(int id)
+        {
+            var categoriaProducto = await _context.CategoriaProductos.Where(p => p.producto_id== id).ToListAsync();
+            if (categoriaProducto == null)
+            {
+                return NotFound("Categoria Producto no encontrada");
+            }
+            var categoriasProductoDto = _mapper.Map<IEnumerable<CategoriaProductoDTO>>(categoriaProducto);
+            return Ok(categoriasProductoDto);
+        }
+
+        [HttpGet("categoria/{id}")]
+        public async Task<ActionResult<List<CategoriaProductoDTO>>> GetCategoriaProductoByCategoriaId(int id)
+        {
+            var categoriaProducto = await _context.CategoriaProductos.Where(p => p.categoria_id == id).ToListAsync();
+            if (categoriaProducto == null)
+            {
+                return NotFound("Categoria Producto no encontrada");
+            }
+            var categoriasProductoDto = _mapper.Map<IEnumerable<CategoriaProductoDTO>>(categoriaProducto);
+            return Ok(categoriasProductoDto);
+        }
+
         [HttpPost]
         public async Task<ActionResult<CategoriaProductoDTO>> AddCategoriaProducto(CategoriaProductoCreateUpdateDTO categoriaProductoDto)
         {

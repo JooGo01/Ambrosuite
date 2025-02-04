@@ -1,5 +1,144 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/productos"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject ProductosService productoService
+@inject CategoriasService categoriaService
+@rendermode InteractiveServer
+
+<h3>Gestión de Productos</h3>
+
+<button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Producto</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="producto" OnValidSubmit="GuardarProducto">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="nombre">Nombre</label>
+            <InputText id="nombre" class="form-control" @bind-Value="producto.nombre" />
+        </div>
+        <div class="form-group">
+            <label for="descripcion">Descripcion</label>
+            <InputText id="descripcion" class="form-control" @bind-Value="producto.descripcion" />
+        </div>
+        <div class="form-group">
+            <label for="precio">Precio</label>
+            <InputNumber id="precio" class="form-control" @bind-Value="producto.precio" />
+        </div>
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var prod in listaProductos)
+        {
+            <tr>
+                <td>@prod.nombre</td>
+                <td>@prod.descripcion</td>
+                <td>@prod.precio</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(prod)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarProducto(prod)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<ProductoFinal> listaProductos = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private ProductoFinal producto = new ProductoFinal
+		{
+			nombre = string.Empty,
+			descripcion = string.Empty,
+			precio = 0,
+			estado = 0
+		};
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProductos();
+    }
+
+    private async Task LoadProductos()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaProductos = await productoService.GetProductosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los productos: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        producto = new ProductoFinal
+            {
+                nombre = string.Empty,
+                descripcion = string.Empty,
+                precio = 0,
+                estado = 0
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(ProductoFinal p_producto)
+    {
+        producto = p_producto;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+		// selectedCategoriaId = p_producto.categoriaId;
+    }
+
+    private async Task GuardarProducto()
+    {
+        if (esNuevoRegistro)
+        {
+            await productoService.agregarProductoAsync(producto);
+        }
+        else
+        {
+            await productoService.updateProductoAsync(producto);
+        }
+        listaProductos = await productoService.GetProductosAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarProducto(ProductoFinal p_producto)
+    {
+        await productoService.deleteProductoAsync(p_producto);
+        listaProductos = await productoService.GetProductosAsync();
+    }
 }
