@@ -46,5 +46,22 @@ namespace Ambrosuite.Web.ServicesWeb
                 throw;
             }
         }
+
+        public async Task createTableAsync()
+        {
+            try
+            {
+                MesaCreateUpdateDTO mesaCreate = new MesaCreateUpdateDTO
+                {
+                    estado = 0
+                };
+                var response = await _httpClient.PostAsJsonAsync("/api/Mesas", mesaCreate);
+                Debug.WriteLine(response);
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex) { 
+                Debug.WriteLine($"Error creating table: {ex.Message}");
+            }
+        }
     }
 }

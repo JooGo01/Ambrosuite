@@ -1,5 +1,160 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/mesa"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject MesasService MesasService
+@rendermode InteractiveServer
+
+<h3>Gestión de Categoria Gasto</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Gasto</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="mesa" OnValidSubmit="GuardarMesa">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="estado">Estado Mesa</label>
+            <InputSelect id="estado" class="form-control" @bind-Value="mesa.estado">
+            @foreach (var status in listEstado)
+            {
+                <option value="@status.num_estado">@status.descripcion</option>
+            }
+            </InputSelect>
+        </div>
+
+        <button type="submit" class="btn btn-success">Guardar</button>
+        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var mesa in listaMesa)
+        {
+            <tr>
+                <td>@mesa.id</td>
+                <td>@estadoActualDePedido(mesa.estado ?? 0)</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(mesa)">Modificar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<Mesa> listaMesa = new();
+	private List<EstadoMesas> listEstado = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private Mesa mesa = new Mesa
+        {
+			estado=0
+        };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMesa();
+        await LoadEstadoMesas();
+    }
+
+	private async Task LoadEstadoMesas()
+	{
+		try
+		{
+			for (int i = 0; i < 4; i++)
+			{
+			    EstadoMesas estado = new EstadoMesas{
+                    num_estado=i,
+                    descripcion = estadoActualDePedido(i)
+                };
+				listEstado.Add(estado);
+			}
+		}
+		catch (Exception ex)
+		{
+			error = $"Error al obtener los roles: {ex.Message}";
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+
+	private string estadoActualDePedido(int estado) => estado switch
+	{
+		0 => "Disponible",
+		1 => "Ocupada",
+		2 => "Reservada",
+		3 => "Limpieza",
+		_ => "Desconocido"
+	};
+
+    private async Task LoadMesa()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaMesa = await MesasService.GetTablesAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los roles: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task MostrarFormularioAgregar()
+    {
+        mesa = new Mesa
+            {
+                estado = 0   
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = false;
+        await GuardarMesa();
+    }
+
+    private void MostrarFormularioModificar(Mesa p_mesa)
+    {
+        mesa = p_mesa;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarMesa()
+    {
+        if (esNuevoRegistro)
+        {
+            await MesasService.createTableAsync();
+        }
+        else
+        {
+            await MesasService.updateTableAsync(mesa);
+        }
+        listaMesa = await MesasService.GetTablesAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
 }
