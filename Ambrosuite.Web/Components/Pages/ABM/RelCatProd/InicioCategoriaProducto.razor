@@ -1,0 +1,186 @@
+﻿@page "/abm/catprod"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject CategoriasService categoriaService
+@inject CategoriaProductosService categoriaProdService
+@inject ProductosService productoService
+@rendermode InteractiveServer
+
+<h3>Gestión de Categoria Producto</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Producto</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="categoria" OnValidSubmit="GuardarCategoriaProducto">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="producto_id">Producto</label>
+            <InputSelect id="producto_id" class="form-control" @bind-Value="categoria.producto_id">
+                @foreach (var productoFinal in productos)
+                {
+                    <option value="@productoFinal.id">@productoFinal.nombre</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="form-group">
+            <label for="categoria_id">Categoria</label>
+            <InputSelect id="categoria_id" class="form-control" @bind-Value="categoria.categoria_id">
+                @foreach (var cate in listaCategoria)
+                {
+                    <option value="@cate.id">@cate.nombre</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Categoria</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var categoria in categoriaProductos)
+        {
+            <tr>
+                <td>@categoria.producto.nombre</td>
+                <td>@categoria.categoria.nombre</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoria)">Modificar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private List<CategoriaProducto> categoriaProductos = new();
+    private List<ProductoFinal> productos = new();
+    private List<Categoria> listaCategoria = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private CategoriaProducto categoria = new CategoriaProducto { 
+			categoria_id = 0,
+			producto_id = 0
+    };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadCategoria();
+        await LoadProducto();
+		await LoadCategoriaProductos();
+    }
+
+    private async Task LoadCategoria()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaCategoria = await categoriaService.GetCategoriaAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener las categorias: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadProducto()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            productos = await productoService.GetProductosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los productos: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+	private async Task LoadCategoriaProductos()
+	{
+		try
+		{
+			isLoading = true;
+			error = null;
+			categoriaProductos = await categoriaProdService.GetCategoriaProductosAsync();
+		}
+		catch (Exception ex)
+		{
+			error = $"Error al obtener las categorias de productos: {ex.Message}";
+		}
+		finally
+		{
+			isLoading = false;
+		}
+	}
+
+    private void MostrarFormularioAgregar()
+    {
+        categoria = new CategoriaProducto
+            {
+				categoria_id = 0,   
+				producto_id = 0
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(CategoriaProducto p_categoria)
+    {
+        categoria = p_categoria;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarCategoriaProducto()
+    {
+        if (esNuevoRegistro)
+        {
+            await categoriaProdService.agregarCategoriaProductosAsync(categoria);
+        }
+        else
+        {
+            await categoriaProdService.updateCategoriaProductosAsync(categoria);
+        }
+        categoriaProductos = await categoriaProdService.GetCategoriaProductosAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarCategoriaProducto(CategoriaProducto p_categoria)
+    {
+        // await CategoriaService.deleteCategoriaAsync(p_categoria);
+        // listaCategoria = await CategoriaService.GetCategoriaAsync();
+    }
+}
