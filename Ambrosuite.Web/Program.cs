@@ -69,6 +69,11 @@ builder.Services.AddHttpClient<InventarioService>(client =>
 {
     client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
 });
+
+builder.Services.AddHttpClient<RecetaService>(client =>
+{
+    client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
+});
 // Configura Kestrel para escuchar en los puertos deseados
 //builder.WebHost.UseUrls("https://localhost:2215", "http://localhost:2216");
 /*

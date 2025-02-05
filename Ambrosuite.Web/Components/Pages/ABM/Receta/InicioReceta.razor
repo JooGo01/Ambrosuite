@@ -1,5 +1,206 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/receta"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject RecetaService recetaService
+@inject IngredientesService ingredienteService
+@inject ProductosService productoService
+@rendermode InteractiveServer
+
+<h3>Gestión de Receta</h3>
+
+<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Receta</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="receta" OnValidSubmit="GuardarReceta">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="form-group">
+            <label for="producto_final_id">Producto</label>
+            <InputSelect id="producto_final_id" class="form-control" @bind-Value="receta.producto_final_id">
+                @foreach (var productoFinal in listaProducto)
+                {
+                    <option value="@productoFinal.id">@productoFinal.nombre</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="form-group">
+            <label for="ingrediente_id">Ingrediente</label>
+            <InputSelect id="ingrediente_id" class="form-control" @bind-Value="receta.ingrediente_id">
+                @foreach (var ing in listaIngrediente)
+                {
+                    <option value="@ing.id">@ing.nombre</option>
+                }
+            </InputSelect>
+        </div>
+
+        <div class="form-group">
+            <label for="cantidad">Cantidad</label>
+            <InputNumber id="cantidad" class="form-control" @bind-Value="receta.cantidad"/>
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Descripcion</label>
+            <InputText id="descripcion" class="form-control" @bind-Value="receta.descripcion" />
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Producto</th>
+            <th>Ingrediente</th>
+            <th>Cantidad</th>
+            <th>Descripcion</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var rec in listaReceta)
+        {
+            <tr>
+                <td>@rec.producto_final.nombre</td>
+                <td>@rec.ingrediente.nombre</td>
+                <td>@rec.cantidad</td>
+                <td>@rec.descripcion</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(rec)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarReceta(rec)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<Receta> listaReceta = new();
+    private List<Ingrediente> listaIngrediente = new();
+    private List<ProductoFinal> listaProducto = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+	private Receta receta = new Receta
+		{
+			producto_final_id = 0,
+			ingrediente_id = 0,
+			cantidad = 0,
+			descripcion = string.Empty
+		};
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProducto();
+        await LoadIngredientes();
+        await LoadReceta();
+    }
+
+    private async Task LoadReceta()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaReceta = await recetaService.GetRecetaAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener las recetas: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadProducto()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaProducto = await productoService.GetProductosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los productos: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadIngredientes()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaIngrediente = await ingredienteService.GetIngredienteAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los ingredientes: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        receta = new Receta
+            {
+                producto_final_id = 0,
+                ingrediente_id = 0,
+                cantidad = 0,
+                descripcion = string.Empty
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(Receta p_receta)
+    {
+        receta = p_receta;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarReceta()
+    {
+        if (esNuevoRegistro)
+        {
+            await recetaService.agregarRecetaAsync(receta);
+        }
+        else
+        {
+            await recetaService.updateRecetaAsync(receta);
+        }
+        listaReceta = await recetaService.GetRecetaAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarReceta(Receta p_receta)
+    {
+        await recetaService.bajaRecetaAsync(p_receta);
+        listaReceta = await recetaService.GetRecetaAsync();
+    }
 }

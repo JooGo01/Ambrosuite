@@ -33,11 +33,15 @@ namespace Ambrosuite.ApiService.Mappers
 
             // Receta
             CreateMap<Receta, RecetaDTO>()
-                .ForMember(dest => dest.productoFinal, opt => opt.MapFrom(src => src.productoFinal))
+                .ForMember(dest => dest.producto_final, opt => opt.MapFrom(src => src.producto_final))
                 .ForMember(dest => dest.ingrediente, opt => opt.MapFrom(src => src.ingrediente));
-            CreateMap<RecetaDTO, Receta>();
+
+            CreateMap<RecetaDTO, Receta>()
+                .ForMember(dest => dest.producto_final, opt => opt.MapFrom(src => src.producto_final))
+                .ForMember(dest => dest.ingrediente, opt => opt.MapFrom(src => src.ingrediente));
 
             CreateMap<RecetaCreateUpdateDTO, Receta>();
+            CreateMap<Receta, RecetaCreateUpdateDTO>();
             CreateMap<RecetaCreateUpdateDTO, RecetaDTO>();
 
             // Mesa 

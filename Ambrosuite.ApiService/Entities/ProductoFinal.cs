@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace Ambrosuite.ApiService.Entities
 {
@@ -12,6 +13,7 @@ namespace Ambrosuite.ApiService.Entities
         public int? estado { get; set; }
 
         // Relación con Receta (uno a muchos)
+        [JsonIgnore]
         public ICollection<Receta> recetas { get; set; }
     }
 }

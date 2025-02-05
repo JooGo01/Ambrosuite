@@ -1,5 +1,6 @@
 ﻿using Ambrosuite.ApiService.Entities;
 using Microsoft.EntityFrameworkCore;
+using static Grpc.Core.Metadata;
 
 namespace Ambrosuite.ApiService.Data
 {
@@ -36,25 +37,34 @@ namespace Ambrosuite.ApiService.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Usuario>()
-                .HasOne (u => u.Rol)
+                .HasOne(u => u.Rol)
                 .WithMany(r => r.Usuarios)
-                .HasForeignKey (u => u.rol_id);
+                .HasForeignKey(u => u.rol_id);
 
-            modelBuilder.Entity<Receta>()
-            .HasKey(r => new { r.id, r.productoFinalId, r.ingredienteId });
 
             modelBuilder.Entity<PedidoFacturacion>()
                 .HasKey(pf => new { pf.pedido_id, pf.facturacion_id });
 
-            modelBuilder.Entity<Receta>()
-                .HasOne(r => r.productoFinal)
-                .WithMany(p => p.recetas)
-                .HasForeignKey(r => r.productoFinalId);
+            modelBuilder.Entity<Receta>(entity =>
+            {
+                entity.ToTable("receta");
+                entity.HasKey(e => e.id);
 
-            modelBuilder.Entity<Receta>()
-                .HasOne(r => r.ingrediente)
-                .WithMany(i => i.recetas)
-                .HasForeignKey(r => r.ingredienteId);
+                entity.Property(e => e.producto_final_id)
+                      .HasColumnName("producto_final_id");
+
+                entity.Property(e => e.ingrediente_id)
+                      .HasColumnName("ingrediente_id");
+
+                // Configura la relación sin usar atributos en la entidad
+                entity.HasOne(e => e.producto_final)
+                      .WithMany(p=>p.recetas) // o .WithMany(p => p.Recetas) si tienes la propiedad inversa
+                      .HasForeignKey(e => e.producto_final_id);
+
+                entity.HasOne(e => e.ingrediente)
+                      .WithMany(p => p.recetas) // o la propiedad inversa, si existe
+                      .HasForeignKey(e => e.ingrediente_id);
+            });
 
             modelBuilder.Entity<Pedido>()
                 .HasOne(r=> r.mesa)
