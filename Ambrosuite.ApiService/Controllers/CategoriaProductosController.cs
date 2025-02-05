@@ -23,7 +23,7 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet]
         public async Task<ActionResult<List<CategoriaProductoDTO>>> GetAllCategoriaProducto()
         {
-            var categoriaProducto = await _context.CategoriaProductos.ToListAsync();
+            var categoriaProducto = await _context.CategoriaProductos.Include(cp=>cp.producto).Include(cp=>cp.categoria).ToListAsync();
             var categoriasProductoDto = _mapper.Map<IEnumerable<CategoriaProductoDTO>>(categoriaProducto);
             return Ok(categoriasProductoDto);
         }
@@ -31,7 +31,7 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoriaProductoDTO>> GetCategoriaProductoById(int id)
         {
-            var categoriaProducto = await _context.CategoriaProductos.FindAsync(id);
+            var categoriaProducto = await _context.CategoriaProductos.Include(cp => cp.producto).Include(cp => cp.categoria).Where(p => p.id == id).ToListAsync();
             if (categoriaProducto == null)
             {
                 return NotFound("Categoria Producto no encontrada");
@@ -43,7 +43,7 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet("producto/{id}")]
         public async Task<ActionResult<List<CategoriaProductoDTO>>> GetCategoriaProductoByProductoId(int id)
         {
-            var categoriaProducto = await _context.CategoriaProductos.Where(p => p.producto_id== id).ToListAsync();
+            var categoriaProducto = await _context.CategoriaProductos.Include(cp => cp.producto).Include(cp => cp.categoria).Where(p => p.producto_id== id).ToListAsync();
             if (categoriaProducto == null)
             {
                 return NotFound("Categoria Producto no encontrada");
@@ -55,7 +55,7 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet("categoria/{id}")]
         public async Task<ActionResult<List<CategoriaProductoDTO>>> GetCategoriaProductoByCategoriaId(int id)
         {
-            var categoriaProducto = await _context.CategoriaProductos.Where(p => p.categoria_id == id).ToListAsync();
+            var categoriaProducto = await _context.CategoriaProductos.Include(cp => cp.producto).Include(cp => cp.categoria).Where(p => p.categoria_id == id).ToListAsync();
             if (categoriaProducto == null)
             {
                 return NotFound("Categoria Producto no encontrada");
