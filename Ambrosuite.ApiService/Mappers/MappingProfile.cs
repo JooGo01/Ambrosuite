@@ -109,7 +109,9 @@ namespace Ambrosuite.ApiService.Mappers
 
             //Inventario
             CreateMap<Inventario, InventarioDTO>()
-                .ForMember(dest => dest.ingrediente_id, opt => opt.MapFrom(src => src.ingrediente.id));
+                .ForMember(dest => dest.ingrediente_id, opt => opt.MapFrom(src => src.ingrediente_id));
+            CreateMap<InventarioCreateUpdateDTO, InventarioDTO>();
+            CreateMap<InventarioDTO, InventarioCreateUpdateDTO>();
             CreateMap<InventarioCreateUpdateDTO, Inventario>();
 
             //PedidoFacturacion

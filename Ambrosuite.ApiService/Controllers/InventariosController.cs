@@ -23,6 +23,13 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Inventario>>> GetAllInventario()
         {
+            var inventarios = await _context.Inventarios.Where(p=>p.stock>0).Include(p => p.ingrediente).ToListAsync();
+            return Ok(inventarios);
+        }
+
+        [HttpGet("todos")]
+        public async Task<ActionResult<List<Inventario>>> GetAllInventarioTodos()
+        {
             var inventarios = await _context.Inventarios.Include(p => p.ingrediente).ToListAsync();
             return Ok(inventarios);
         }

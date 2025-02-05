@@ -1,5 +1,177 @@
-﻿<h3>InicioCategoriaGasto</h3>
+﻿@page "/abm/inventario"
+@using Ambrosuite.ApiService.Entities;
+@using Ambrosuite.Web.ServicesWeb;
+@using System.Diagnostics;
+@inject InventarioService InventarioService
+@inject IngredientesService IngredientesService
+@rendermode InteractiveServer
+
+<h3>Gestión de Inventario</h3>
+
+<button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Inventario</button>
+
+@if (mostrarFormulario)
+{
+    <EditForm Model="inventario" OnValidSubmit="GuardarInventario">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="form-group">
+            <label for="ingrediente_id">Ingrediente</label>
+            <InputSelect id="ingrediente_id" class="form-control" @bind-Value="inventario.ingrediente_id">
+                @foreach (var ing in ingredientes)
+                {
+                    <option value="@ing.id">@ing.nombre</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="form-group">
+            <label for="lote">Lote</label>
+            <InputText id="lote" class="form-control" @bind-Value="inventario.lote" />
+        </div>
+        <div class="form-group">
+            <label for="stock">Stock</label>
+            <InputNumber id="stock" class="form-control" @bind-Value="inventario.stock" />
+        </div>
+        <div class="form-group">
+            <label for="fecha_vencimiento">Fecha de Vencimiento</label>
+            <InputDate id="fecha_vencimiento" class="form-control" @bind-Value="inventario.fecha_vencimiento" />
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-success">Guardar</button>
+            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+        </div>
+    </EditForm>
+}
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Descripcion</th>
+            <th>Lote</th>
+            <th>Stock</th>
+            <th>Fecha Vencimiento</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var inv in listaInventario)
+        {
+            <tr>
+                <td>@inv.ingrediente.nombre</td>
+                <td>@inv.ingrediente.descripcion</td>
+                <td>@inv.lote</td>
+                <td>@inv.stock</td>
+                <td>@inv.fecha_vencimiento</td>
+                <td>
+                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(inv)">Modificar</button>
+                    <button class="btn btn-danger" @onclick="() => EliminarInventario(inv)">Eliminar</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
 @code {
+    private List<Inventario> listaInventario = new();
+    private List<Ingrediente> ingredientes = new();
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private Inventario inventario = new Inventario
+        {
+            lote = String.Empty,
+            stock = 0,
+            fecha_vencimiento = DateTime.Now,
+            ingrediente_id = 0
+        };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
 
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadInventario();
+        await LoadIngrediente();
+    }
+
+    private async Task LoadInventario()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            listaInventario = await InventarioService.GetInventariosAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los inventarios: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task LoadIngrediente()
+    {
+        try
+        {
+            isLoading = true;
+            error = null;
+            ingredientes = await IngredientesService.GetIngredienteAsync();
+        }
+        catch (Exception ex)
+        {
+            error = $"Error al obtener los ingredientes: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        inventario = new Inventario
+            {
+                lote = String.Empty,
+                stock = 0,
+                fecha_vencimiento = DateTime.Now,
+                ingrediente_id = 0
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioModificar(Inventario p_inventario)
+    {
+        inventario = p_inventario;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private async Task GuardarInventario()
+    {
+        if (esNuevoRegistro)
+        {
+            await InventarioService.agregarInventarioAsync(inventario);
+        }
+        else
+        {
+            await InventarioService.updateInventarioAsync(inventario);
+        }
+        listaInventario = await InventarioService.GetInventariosAsync();
+        mostrarFormulario = false;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarInventario(Inventario p_inventario)
+    {
+        await InventarioService.deleteInventarioAsync(p_inventario);
+        listaInventario = await InventarioService.GetInventariosAsync();
+    }
 }
