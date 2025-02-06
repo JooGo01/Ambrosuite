@@ -1,4 +1,6 @@
 ﻿using System.Security.Claims;
+using System.Security.Cryptography;
+using System.Text;
 using Ambrosuite.ApiService.Data;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -29,9 +31,15 @@ namespace Ambrosuite.Web.Entities
 
             // Buscar el usuario por CUIL en la base de datos
             var usuario = await _context.Usuarios
-                .FirstOrDefaultAsync(u => u.cuil == LoginData.CUIL && u.baja == 0);
+                .FirstOrDefaultAsync(u => u.email == LoginData.email && u.baja == 0);
 
-            if (usuario == null || usuario.contrasenia != LoginData.Password)
+            var passwordHash = "";
+            using (var sha256 = SHA256.Create())
+            {
+                passwordHash = BitConverter.ToString(sha256.ComputeHash(Encoding.UTF8.GetBytes(LoginData.password))).Replace("-", "").ToLowerInvariant();
+            }
+
+            if (usuario == null || usuario.contrasenia != passwordHash)
             {
                 ModelState.AddModelError(string.Empty, "CUIL o contraseña incorrectos");
                 return Page();
@@ -42,6 +50,7 @@ namespace Ambrosuite.Web.Entities
         {
             new Claim(ClaimTypes.NameIdentifier, usuario.id.ToString()),
             new Claim(ClaimTypes.Name, usuario.nombre),
+            new Claim(ClaimTypes.Email, usuario.email),
             new Claim("CUIL", usuario.cuil),
             new Claim(ClaimTypes.Role, usuario.rol_id.ToString())
         };
@@ -54,13 +63,13 @@ namespace Ambrosuite.Web.Entities
             await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
             // Redirigir a la página principal o la que requieras
-            return RedirectToPage("/Index");
+            return RedirectToPage("/");
         }
 
         public async Task<IActionResult> OnPostLogoutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToPage("/Account/Login");
+            return RedirectToPage("/Login");
         }
     }
 }

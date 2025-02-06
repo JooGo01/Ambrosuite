@@ -14,25 +14,25 @@
 }
 
 <div>
-    <label>CUIL</label>
-    <input @bind="CUIL" class="form-control" />
+    <label>Email</label>
+    <input @bind="email" class="form-control" />
 </div>
 
 <div>
     <label>Contraseña</label>
-    <input type="password" @bind="Password" class="form-control" />
+    <input type="password" @bind="password" class="form-control" />
 </div>
 
 <button @onclick="Login" class="btn btn-primary">Ingresar</button>
 
 @code {
-    private string CUIL { get; set; } = "";
-    private string Password { get; set; } = "";
+    private string email { get; set; } = "";
+    private string password { get; set; } = "";
     private string ErrorMessage { get; set; } = "";
 
     private async Task Login()
     {
-        var loginData = new LoginViewModel { CUIL = CUIL, Password = Password };
+        var loginData = new LoginViewModel { email = email, password = password};
 
         bool success = await AuthService.Login(loginData);
 
@@ -42,7 +42,7 @@
         }
         else
         {
-            ErrorMessage = "CUIL o contraseña incorrectos.";
+            ErrorMessage = "Email o contraseña incorrectos.";
         }
     }
 }

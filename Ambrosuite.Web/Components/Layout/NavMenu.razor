@@ -1,4 +1,7 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using Ambrosuite.Web.ServicesWeb;
+@rendermode InteractiveServer
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">Ambrosuite</a>
     </div>
@@ -37,5 +40,22 @@
                 <span class="bi bi-gear-fill" aria-hidden="true"></span> Administracion
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" @onclick="Logout" href="#">
+                <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Cerrar Sesión
+            </NavLink>
+        </div>
     </nav>
 </div>
+
+@code {
+    [Inject]
+    private AuthService authService { get; set; }
+
+    private async Task Logout()
+    {
+        // Llamamos al servicio de cierre de sesión
+        await authService.Logout();
+    }
+}
