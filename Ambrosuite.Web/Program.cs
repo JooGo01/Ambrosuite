@@ -74,24 +74,19 @@ builder.Services.AddHttpClient<RecetaService>(client =>
 {
     client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
 });
-// Configura Kestrel para escuchar en los puertos deseados
-//builder.WebHost.UseUrls("https://localhost:2215", "http://localhost:2216");
-/*
-builder.WebHost.ConfigureKestrel(options =>
-{
-    // Puerto HTTPS
-    options.ListenAnyIP(2215, listenOptions => listenOptions.UseHttps());  // HTTPS en el puerto 2215
-    // Puerto HTTP
-    options.ListenAnyIP(2216);  // HTTP en el puerto 2216
-});
-*/
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
+builder.Services.AddHttpClient<AuthService>(client =>
 {
-    // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
-    // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
-    client.BaseAddress = new("https+http://apiservice");
+    client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
 });
+
+builder.Services.AddAuthentication("CookieAuth")
+    .AddCookie("CookieAuth", options =>
+    {
+        options.LoginPath = "/Login";    // Ruta de login
+        options.AccessDeniedPath = "/AccessDenied";
+        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    });
 
 var app = builder.Build();
 
@@ -100,6 +95,10 @@ if (!app.Environment.IsDevelopment())
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
+
+// Asegúrate de que la autenticación se ejecute antes de la autorización
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();

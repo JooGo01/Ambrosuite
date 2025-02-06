@@ -1,7 +1,48 @@
 ﻿@page "/"
+@using Ambrosuite.Web.ServicesWeb
+@using Ambrosuite.ApiService.Entities;
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
 
 <PageTitle>Home</PageTitle>
 
 <h1>Hola! </h1>
 
 Bienvenido a Ambrosuite
+
+@code {
+    private bool isAuthenticated = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Este método se ejecuta solo una vez al inicio
+        await CheckAuthentication();
+    }
+
+    private async Task CheckAuthentication()
+    {
+        if (isBrowser)
+        {
+            // Solo realizar la llamada si estamos en el cliente
+            isAuthenticated = await AuthService.IsAuthenticatedAsync();
+
+            if (!isAuthenticated)
+            {
+                Navigation.NavigateTo("/login");
+            }
+        }
+    }
+
+    // Indicador para saber si estamos en el cliente
+    private bool isBrowser = false;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isBrowser = true;
+            await CheckAuthentication();
+        }
+    }
+}

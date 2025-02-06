@@ -1,9 +1,14 @@
 ﻿@inherits LayoutComponentBase
+@inject NavigationManager Navigation
 
 <div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+     @if (Navigation.Uri.Contains("/login") == false)
+     {
+        <div class="sidebar">
+            <!-- Aquí va el contenido de tu barra lateral -->
+            <NavMenu />
+        </div>
+    }
 
     <main>
         <div class="top-row px-4">

@@ -1,0 +1,48 @@
+﻿@page "/login"
+@using Ambrosuite.Web.Entities
+@inject NavigationManager Navigation
+@inject HttpClient Http
+@rendermode InteractiveServer
+@using Ambrosuite.Web.ServicesWeb;
+@inject AuthService AuthService
+
+<h3>Iniciar Sesión</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <div class="alert alert-danger">@ErrorMessage</div>
+}
+
+<div>
+    <label>CUIL</label>
+    <input @bind="CUIL" class="form-control" />
+</div>
+
+<div>
+    <label>Contraseña</label>
+    <input type="password" @bind="Password" class="form-control" />
+</div>
+
+<button @onclick="Login" class="btn btn-primary">Ingresar</button>
+
+@code {
+    private string CUIL { get; set; } = "";
+    private string Password { get; set; } = "";
+    private string ErrorMessage { get; set; } = "";
+
+    private async Task Login()
+    {
+        var loginData = new LoginViewModel { CUIL = CUIL, Password = Password };
+
+        bool success = await AuthService.Login(loginData);
+
+        if (success)
+        {
+            Navigation.NavigateTo("/");
+        }
+        else
+        {
+            ErrorMessage = "CUIL o contraseña incorrectos.";
+        }
+    }
+}
