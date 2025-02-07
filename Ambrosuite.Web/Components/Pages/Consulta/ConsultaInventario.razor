@@ -1,0 +1,47 @@
+﻿@page "/inventario"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.Web.ServicesWeb
+@inject InventarioService InventarioService
+
+<h3 class="mb-4">Inventario</h3>
+
+@if (inventario == null)
+{
+    <p>Cargando inventario...</p>
+}
+else if (!inventario.Any())
+{
+    <p>No hay stock disponible.</p>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var item in inventario)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card text-white bg-secondary">
+                        <div class="card-header">Lote: @item.lote</div>
+                        <div class="card-body">
+                            <h5 class="card-title">@item.ingrediente.nombre</h5>
+                            <p class="card-text"><strong>Cantidad:</strong> @item.stock</p>
+                            <p class="card-text"><small><strong>Vence:</strong> @item.fecha_vencimiento</small></p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private List<Inventario> inventario;
+
+    protected override async Task OnInitializedAsync()
+    {
+		List<Inventario> inv = new List<Inventario>();
+        inv = await InventarioService.GetInventariosAsync();
+        inv.OrderBy(i => i.fecha_vencimiento).ToList();
+		inventario = inv;
+    }
+}
