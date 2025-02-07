@@ -79,5 +79,80 @@ namespace Ambrosuite.ApiService.Controllers
             var inventarioActualizadoDto = _mapper.Map<InventarioDTO>(inventario);
             return Ok(inventarioActualizadoDto);
         }
+
+        [HttpPost("{pedidoId}/actualizarstock")]
+        public async Task<IActionResult> ActualizarStockIngredientes(int pedidoId)
+        {
+            try
+            {
+                using (var context = _context)
+                {
+                // Obtener los productos del pedido
+                    var productosDelPedido = await context.PedidoDetalles
+                    .Where(pd => pd.pedido_id == pedidoId && pd.estado == 0)
+                    .ToListAsync();
+
+                    foreach (var detalle in productosDelPedido)
+                    {
+                        // Obtener los ingredientes de cada producto
+                        var productos = await context.ProductosFinales
+                            .Where(r => r.id == detalle.producto_id && r.estado == 0)
+                            .ToListAsync();
+                        foreach (var producto in productos)
+                        {
+                            var recetas = await context.Recetas
+                                .Where(r => r.producto_final_id == producto.id && r.estado == 0)
+                                .ToListAsync();
+
+                            foreach (var receta in recetas)
+                            {
+                                var ingredientes = await context.Ingredientes
+                                    .Where(i => i.id == receta.ingrediente_id && i.estado == 0)
+                                    .ToListAsync();
+                                foreach (var ingrediente in ingredientes)
+                                {
+                                    double cantidadNecesaria = (double)(receta.cantidad * detalle.cantidad);
+    
+                                    // Obtener inventarios disponibles para el ingrediente, ordenados por menor stock
+                                    var inventarios = await context.Inventarios
+                                        .Where(i => i.ingrediente_id == ingrediente.id && i.stock > 0)
+                                        .OrderBy(i => i.stock) // Ordenar de menor a mayor
+                                        .ToListAsync();
+
+                                    foreach (var inventario in inventarios)
+                                    {
+                                        if (cantidadNecesaria <= 0) break; // Si ya se cubrió la necesidad, salir
+        
+                                        if (inventario.stock >= cantidadNecesaria)
+                                        {
+                                            // Descontar lo necesario y salir
+                                            inventario.stock -= cantidadNecesaria;
+                                            cantidadNecesaria = 0;
+                                        }
+                                        else
+                                        {
+                                            // Consumir todo el stock de este registro y continuar con el siguiente
+                                            cantidadNecesaria -= (double)inventario.stock;
+                                            inventario.stock = 0;
+                                        }
+                                    }
+    
+                                    if (cantidadNecesaria > 0)
+                                    {
+                                        return BadRequest(new { error = $"Stock insuficiente para el ingrediente {ingrediente.id}" }); 
+                                    }
+                                }
+                            }
+                        }
+                    }
+    
+                    // Guardar cambios en la base de datos
+                    await context.SaveChangesAsync();
+                    return Ok(new { mensaje = "Stock actualizado correctamente." });
+                }
+            }catch (Exception ex){
+                return BadRequest(new { error = ex.Message });
+            }
+        }
     }
 }
