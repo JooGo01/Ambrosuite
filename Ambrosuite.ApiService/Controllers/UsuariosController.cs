@@ -85,6 +85,15 @@ namespace Ambrosuite.ApiService.Controllers
             var usuario = _mapper.Map<UsuarioDTO>(usuarioBuscado);
             return Ok(usuario);
         }
+
+        [HttpGet("rol/{mail}")]
+        public async Task<ActionResult<Usuario>> GetUsuariosByMail(String mail)
+        {
+            var usuarios = await _context.Usuarios.Include(u => u.Rol).FirstOrDefaultAsync(u => u.email== mail);
+            //var usuariosDto = _mapper.Map<IEnumerable<UsuarioDTO>>(usuarios);
+            return Ok(usuarios);
+        }
+
         [HttpPost]
         public async Task<ActionResult<UsuarioDTO>> AddUsuario(UsuarioCreateUpdateDTO usuarioDto)
         {

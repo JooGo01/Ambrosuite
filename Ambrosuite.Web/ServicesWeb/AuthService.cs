@@ -26,8 +26,12 @@ namespace Ambrosuite.Web.ServicesWeb
 
             if (response.IsSuccessStatusCode)
             {
-                // Guardar sesión en LocalStorage
+                var usuario_rol = await _http.GetFromJsonAsync<Usuario>("api/usuarios/rol/" + loginData.email);
+                // Guardar sesión y rol en LocalStorage
                 await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "sessionActive", "true");
+
+                var rol_usuario = await _http.GetFromJsonAsync<Rol>("api/roles/" + usuario_rol.rol_id);
+                await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userRole", rol_usuario.nombre_rol);
                 return true;
             }
 
@@ -40,9 +44,22 @@ namespace Ambrosuite.Web.ServicesWeb
             return session == "true";
         }
 
+        public async Task<bool> IsInRoleAsync(string role)
+        {
+            var userRole = await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userRole");
+            return userRole == role;
+        }
+
+        public async Task<string> GetRoleAsync()
+        {
+            return await _jsRuntime.InvokeAsync<string>("localStorage.getItem", "userRole") ?? string.Empty;
+        }
+
+
         public async Task Logout()
         {
             await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "sessionActive");
+            await _jsRuntime.InvokeVoidAsync("localStorage.removeItem", "userRole");
             _navigation.NavigateTo("/login", forceLoad: true);
         }
     }

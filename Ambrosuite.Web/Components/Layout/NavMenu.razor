@@ -1,4 +1,5 @@
 ﻿@using Ambrosuite.Web.ServicesWeb;
+@using Microsoft.AspNetCore.Authorization;
 @rendermode InteractiveServer
 
 <div class="top-row ps-3 navbar navbar-dark">
@@ -29,23 +30,23 @@
             </NavLink>
         </div>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="ambrosuite">
-                <span class="bi bi-egg-fried" aria-hidden="true"></span> Ambrosuite
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="inventario">
-                <span class="bi bi-gear-fill" aria-hidden="true"></span> Inventario
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="abm">
-                <span class="bi bi-gear-fill" aria-hidden="true"></span> Administracion
-            </NavLink>
-        </div>
+        @if (UserRole.Equals("Cocinero"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="inventario">
+                    <span class="bi bi-gear-fill" aria-hidden="true"></span> Inventario
+                </NavLink>
+            </div>
+        }
+        
+        @if (UserRole.Equals("Administracion"))
+        {
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="abm">
+                    <span class="bi bi-gear-fill" aria-hidden="true"></span> Administracion
+                </NavLink>
+            </div>
+        }
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" @onclick="Logout" href="#">
@@ -58,6 +59,17 @@
 @code {
     [Inject]
     private AuthService authService { get; set; }
+
+    private string UserRole { get; set; } = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender) // Solo ejecuta en el primer renderizado
+        {
+            UserRole = await authService.GetRoleAsync();
+            StateHasChanged(); // Forzar actualización del UI después de obtener el rol
+        }
+    }
 
     private async Task Logout()
     {
