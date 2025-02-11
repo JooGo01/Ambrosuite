@@ -1,6 +1,40 @@
-﻿<Router AppAssembly="@typeof(Program).Assembly">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+<Router AppAssembly="@typeof(Program).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)" />
+        <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(Layout.MainLayout)">
+            <Authorizing>
+                <p>Autorizando...</p>
+            </Authorizing>
+            <NotAuthorized>
+                <p>No tienes permiso para ver esta página.</p>
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
+    <NotFound>
+        <LayoutView Layout="@typeof(Layout.MainLayout)">
+            <p>Lo sentimos, no encontramos esa página.</p>
+        </LayoutView>
+    </NotFound>
 </Router>
+
+@code {
+    private string GetRequiredRole(string pageTypeFullName)
+    {
+        // Aquí puedes definir la lógica para determinar el rol requerido basado en el nombre completo del tipo de página
+        // Por ejemplo:
+        if (pageTypeFullName.Contains("AdminPage"))
+        {
+            return "Admin";
+        }
+        else if (pageTypeFullName.Contains("UserPage"))
+        {
+            return "User";
+        }
+        else if (pageTypeFullName.Contains("HomeABM"))
+        {
+            return "Administracion";
+        }
+        return string.Empty; // Sin restricción de rol
+    }
+}

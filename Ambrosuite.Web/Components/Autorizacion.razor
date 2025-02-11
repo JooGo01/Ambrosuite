@@ -1,0 +1,44 @@
+﻿@using Ambrosuite.Web.ServicesWeb
+@inject AuthService AuthService
+@inject NavigationManager Navigation
+
+@code {
+    [Parameter]
+    public string RequiredRole { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    private bool isAuthorized;
+    private bool isRendered;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            isRendered = true;
+            var isAuthenticated = await AuthService.IsAuthenticatedAsync();
+            if (!isAuthenticated)
+            {
+                Navigation.NavigateTo("/login");
+                return;
+            }
+
+            var userRole = await AuthService.GetRoleAsync();
+            if (string.IsNullOrEmpty(RequiredRole) || userRole == RequiredRole)
+            {
+                isAuthorized = true;
+                StateHasChanged();
+            }
+            else
+            {
+                Navigation.NavigateTo("/unauthorized");
+            }
+        }
+    }
+}
+
+@if (isRendered && isAuthorized)
+{
+    @ChildContent
+}

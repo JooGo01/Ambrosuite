@@ -4,29 +4,29 @@
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
-<PageTitle>Panel de administración</PageTitle>
-
-<div class="layout-container">
-    <div class="main-content">
-        <div class="top-bar">
-            <h1>Gestión de Objetos</h1>
-        </div>
-
-        <div class="items-grid">
-            @foreach (var item in GetItems())
-            {
-                <div class="item-card" @onclick="() => NavigateToPage(item.Page)">
-                    <div class="item-icon">
-                        <img src="@item.Icon" alt="@item.Name" />
+<Autorizacion RequiredRole="Administracion">
+    <PageTitle>Panel de administración</PageTitle>
+    <div class="layout-container">
+        <div class="main-content">
+            <div class="top-bar">
+                <h1>Gestión de Objetos</h1>
+            </div>
+            <div class="items-grid">
+                @foreach (var item in GetItems())
+                {
+                    <div class="item-card" @onclick="() => NavigateToPage(item.Page)">
+                        <div class="item-icon">
+                            <img src="@item.Icon" alt="@item.Name" />
+                        </div>
+                        <div class="item-name">
+                            <span>@item.Name</span>
+                        </div>
                     </div>
-                    <div class="item-name">
-                        <span>@item.Name</span>
-                    </div>
-                </div>
-            }
+                }
+            </div>
         </div>
     </div>
-</div>
+</Autorizacion>
 
 @code {
     private List<Item> GetItems() => new()
