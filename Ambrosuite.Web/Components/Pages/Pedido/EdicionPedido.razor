@@ -1,0 +1,147 @@
+@page "/editar-pedido/{pedidoId:int}"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.Web.ServicesWeb
+@inject PedidosService PedidoService;
+@inject ProductosService ProductoService;
+@inject PedidoDetalleService PedidoDetalleService
+@inject NavigationManager Navigation
+@code {
+    [Parameter] public int pedidoId { get; set; }
+    private List<PedidoDetalle>? pedidoDetalles;
+    private List<ProductoFinal> productos;
+    private Pedido pedido;
+
+    private bool isLoading = true;
+    private bool isVisible = false;
+    private string? error;
+    private PedidoDetalle pedidoDetalle = new PedidoDetalle { 
+            pedido_id=0,
+			producto_id = 0,
+			estado = 0,
+			cantidad = 0,
+    };
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pedido = await PedidoService.GetPedidoByIdAsync(pedidoId);
+        pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+		productos = await ProductoService.GetProductosAsync();
+    }
+
+    private async Task GuardarDetalle()
+    {
+		pedidoDetalle.pedido_id = pedidoId;
+        if (esNuevoRegistro)
+        {
+            await PedidoDetalleService.agregarPedidoDetalleAsync(pedidoDetalle);
+            
+        }
+        else
+        {
+            await PedidoDetalleService.updatePedidoDetalleAsync(pedidoDetalle);
+        }
+        pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarDetalle(PedidoDetalle p_pedidoDetalle)
+    {
+        if (p_pedidoDetalle != null)
+        {
+            await PedidoDetalleService.deletePedidoDetalleAsync(p_pedidoDetalle);
+        }
+    }
+
+    private void MostrarFormularioModificar(PedidoDetalle p_pedidoDetalle)
+    {
+        pedidoDetalle = p_pedidoDetalle;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        pedidoDetalle = new PedidoDetalle
+            {
+                pedido_id = pedidoId,
+                producto_id = 0,
+                estado = 0,
+                cantidad = 0,
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+}
+
+@if (pedido != null)
+{
+    <h3>Editar Pedido</h3>
+    <div>
+        <label>Fecha y Hora:</label>
+        <InputDate @bind-Value="pedido.fecha_hora" />
+    </div>
+    <div>
+        <label>Total:</label>
+        <InputNumber @bind-Value="pedido.total" />
+    </div>
+    <div>
+        <label>Estado:</label>
+        <InputSelect @bind-Value="pedido.estado">
+            <option value="0">Pendiente</option>
+            <option value="1">En Proceso</option>
+            <option value="2">Completado</option>
+            <option value="3">Cancelado</option>
+        </InputSelect>
+    </div>
+
+    <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Detalle</button>
+
+    @if (mostrarFormulario)
+    {
+        <EditForm Model="pedidoDetalle" OnValidSubmit="GuardarDetalle">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-group">
+                <label for="producto_id">Producto</label>
+                <InputSelect id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id">
+                    @foreach (var prod in productos)
+                    {
+                        <option value="@prod.id">@prod.nombre</option>
+                    }
+                </InputSelect>
+            </div>
+            <input type="hidden" @bind="pedidoDetalle.pedido_id" />
+            <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <InputNumber id="cantidad" class="form-control" @bind-Value="pedidoDetalle.cantidad" />
+            </div>
+            <div class="form-group">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </div>
+        </EditForm>
+    }
+
+    <div>
+        <h4>Detalles</h4>
+        @foreach (var detalle in pedidoDetalles)
+        {
+            <div>
+                <p>@detalle.producto.descripcion</p>
+                <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(detalle)">Modificar</button>
+                <button @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Cargando...</p>
+}
