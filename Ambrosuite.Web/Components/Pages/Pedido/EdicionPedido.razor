@@ -44,10 +44,17 @@
                 <div class="form-group">
                     <label for="producto_id">Producto</label>
                     <InputSelect id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id" disabled="@(productosFiltrados.Count == 0)">
-                        <option value="0">Seleccione un producto</option>
-                        @foreach (var prod in productosFiltrados)
+                        @if (productosFiltrados.Count == 0)
                         {
-                            <option value="@prod.id">@prod.nombre</option>
+                            <option value="0">Seleccione un producto</option>
+                        }
+                        else
+                        {
+                            @foreach (var prod in productosFiltrados)
+                            {
+                                <option value="@prod.id">@prod.nombre</option>
+
+                            }
                         }
                     </InputSelect>
                 </div>
@@ -56,7 +63,7 @@
             {
                 <div class="form-group">
                     <label for="producto">Producto</label>
-                    <InputText id="producto" class="form-control" @bind-value="pedidoDetalle.producto.descripcion" disabled/>
+                    <InputText id="producto" class="form-control" @bind-Value="pedidoDetalle.producto.nombre" disabled />
                 </div>
                 <InputNumber id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id" hidden />
             }
@@ -65,6 +72,7 @@
             <div class="form-group">
                 <label for="cantidad">Cantidad</label>
                 <InputNumber id="cantidad" class="form-control" @bind-Value="pedidoDetalle.cantidad" />
+                <ValidationMessage For="@(() => pedidoDetalle.cantidad)" />
             </div>
             <div class="form-group mt-3">
                 <button type="submit" class="btn btn-success">Guardar</button>
@@ -111,7 +119,6 @@ else
             FiltrarProductosPorCategoria();
         }
     }
-
 
     private PedidoDetalle pedidoDetalle = new()
         {
@@ -172,6 +179,12 @@ else
             };
         esNuevoRegistro = true;
         mostrarFormulario = true;
+
+        if (productosFiltrados.Count > 0)
+        {
+            pedidoDetalle.producto_id = productosFiltrados.First().id;
+        }
+        StateHasChanged(); // Forzar actualización del componente
     }
 
     private void Cancelar()
@@ -181,7 +194,7 @@ else
 
     private void FiltrarProductosPorCategoria()
     {
-        pedidoDetalle.producto_id = 0; // Reinicia la selección del producto
+        // pedidoDetalle.producto_id = 0; Reinicia la selección del producto
 
         if (categoriaSeleccionada == 0)
         {
@@ -195,9 +208,13 @@ else
             .Where(p => p != null)
             .ToList();
 
+        if (productosFiltrados.Count > 0)
+        {
+            pedidoDetalle.producto_id = productosFiltrados.First().id;
+        }
+
         StateHasChanged();
     }
-
 
     private string getEstadoPedido(int? estado)
     {
