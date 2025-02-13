@@ -1,6 +1,7 @@
 @using Ambrosuite.ApiService.Entities;
 @using Ambrosuite.Web.ServicesWeb;
 @using System.Diagnostics
+@inject NavigationManager Navigation
 @inject PedidosService PedidoService
 
 <div class="modal fade @(mesa != null ? "show" : "")" style="@(mesa != null ? "display: block;" : "display: none; background: rgba(0, 0, 0, 0.5);")">
@@ -24,6 +25,7 @@
                             <p><strong>Estado:</strong> @estadoActualDePedido(pedidoEnCurso)</p>
                             <p><strong>Usuario:</strong> @pedidoEnCurso.usuario.nombre @pedidoEnCurso.usuario.apellido</p>
                             <NavLink class="btn btn-info" href="@($"/pedido/{pedidoEnCurso.id}")">Ver Detalle del Pedido</NavLink>
+                            <button class="btn btn-warning" @onclick="() => EditarPedido(pedidoEnCurso.id)">Editar Pedido</button>
                         </div>
                     }
                     else
@@ -106,5 +108,10 @@
     private async Task CloseModal()
     {
         await CloseModalCallback.InvokeAsync();
+    }
+
+    private void EditarPedido(int pedidoId)
+    {
+        Navigation.NavigateTo($"/editar-pedido/{pedidoId}");
     }
 }

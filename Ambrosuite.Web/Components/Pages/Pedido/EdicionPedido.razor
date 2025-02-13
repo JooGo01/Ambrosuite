@@ -3,40 +3,128 @@
 @using Ambrosuite.Web.ServicesWeb
 @inject PedidosService PedidoService;
 @inject ProductosService ProductoService;
-@inject PedidoDetalleService PedidoDetalleService
-@inject NavigationManager Navigation
+@inject PedidoDetalleService PedidoDetalleService;
+@inject CategoriaProductosService CategoriaProductosService;
+@inject CategoriasService CategoriasService;
+@inject NavigationManager Navigation;
+@rendermode InteractiveServer
+
+@if (pedido != null)
+{
+    <h3>Editar Pedido</h3>
+    <div class="form-group">
+        <label>Fecha y Hora: @pedido.fecha_hora</label>
+    </div>
+    <div class="form-group">
+        <label>Total: @pedido.total</label>
+    </div>
+    <div class="form-group">
+        <label>Estado: @getEstadoPedido(pedido.estado)</label>
+    </div>
+
+    <button type="button" class="btn btn-primary my-3" @onclick="MostrarFormularioAgregar">Agregar Detalle</button>
+
+    @if (mostrarFormulario)
+    {
+        <EditForm Model="pedidoDetalle" OnValidSubmit="GuardarDetalle">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            @if (esNuevoRegistro)
+            {
+                <div class="form-group">
+                    <label for="categoria_id">Categoría</label>
+                    <InputSelect id="categoria_id" class="form-control" @bind-Value="categoriaSeleccionada" @onchange="FiltrarProductosPorCategoria">
+                        <option value="0">Seleccione una categoría</option>
+                        @foreach (var categoria in categorias)
+                        {
+                            <option value="@categoria.id">@categoria.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label for="producto_id">Producto</label>
+                    <InputSelect id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id" disabled="@(productosFiltrados.Count == 0)">
+                        <option value="0">Seleccione un producto</option>
+                        @foreach (var prod in productosFiltrados)
+                        {
+                            <option value="@prod.id">@prod.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label for="producto">Producto</label>
+                    <InputText id="producto" class="form-control" @bind-value="pedidoDetalle.producto.descripcion" disabled/>
+                </div>
+                <InputNumber id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id" hidden />
+            }
+            <input type="hidden" @bind="pedidoDetalle.pedido_id" />
+
+            <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <InputNumber id="cantidad" class="form-control" @bind-Value="pedidoDetalle.cantidad" />
+            </div>
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </div>
+        </EditForm>
+    }
+
+    <div class="mt-4">
+        <h4>Detalles</h4>
+        @foreach (var detalle in pedidoDetalles)
+        {
+            <div class="d-flex align-items-center mb-2">
+                <p class="m-0 flex-grow-1">@detalle.producto.descripcion</p>
+                <button class="btn btn-warning btn-sm mx-1" @onclick="() => MostrarFormularioModificar(detalle)">Modificar</button>
+                <button class="btn btn-danger btn-sm" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Cargando...</p>
+}
+
 @code {
     [Parameter] public int pedidoId { get; set; }
     private List<PedidoDetalle>? pedidoDetalles;
-    private List<ProductoFinal> productos;
+    private List<ProductoFinal> productos = new();
+    private List<ProductoFinal> productosFiltrados = new();
+    private List<CategoriaProducto> categoriaProductos = new();
+    private List<Categoria> categorias = new();
+    private int categoriaSeleccionada = 0;
     private Pedido pedido;
-
-    private bool isLoading = true;
-    private bool isVisible = false;
-    private string? error;
-    private PedidoDetalle pedidoDetalle = new PedidoDetalle { 
-            pedido_id=0,
-			producto_id = 0,
-			estado = 0,
-			cantidad = 0,
-    };
     private bool mostrarFormulario = false;
     private bool esNuevoRegistro = true;
+
+    private PedidoDetalle pedidoDetalle = new()
+        {
+            pedido_id = 0,
+            producto_id = 0,
+            estado = 0,
+            cantidad = 0,
+        };
 
     protected override async Task OnInitializedAsync()
     {
         pedido = await PedidoService.GetPedidoByIdAsync(pedidoId);
         pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
-		productos = await ProductoService.GetProductosAsync();
+        productos = await ProductoService.GetProductosAsync();
+        categorias = await CategoriasService.GetCategoriaAsync();
+        categoriaProductos = await CategoriaProductosService.GetCategoriaProductosAsync();
     }
 
     private async Task GuardarDetalle()
     {
-		pedidoDetalle.pedido_id = pedidoId;
+        pedidoDetalle.pedido_id = pedidoId;
         if (esNuevoRegistro)
         {
             await PedidoDetalleService.agregarPedidoDetalleAsync(pedidoDetalle);
-            
         }
         else
         {
@@ -51,6 +139,7 @@
         if (p_pedidoDetalle != null)
         {
             await PedidoDetalleService.deletePedidoDetalleAsync(p_pedidoDetalle);
+            pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
         }
     }
 
@@ -78,70 +167,43 @@
     {
         mostrarFormulario = false;
     }
-}
 
-@if (pedido != null)
-{
-    <h3>Editar Pedido</h3>
-    <div>
-        <label>Fecha y Hora:</label>
-        <InputDate @bind-Value="pedido.fecha_hora" />
-    </div>
-    <div>
-        <label>Total:</label>
-        <InputNumber @bind-Value="pedido.total" />
-    </div>
-    <div>
-        <label>Estado:</label>
-        <InputSelect @bind-Value="pedido.estado">
-            <option value="0">Pendiente</option>
-            <option value="1">En Proceso</option>
-            <option value="2">Completado</option>
-            <option value="3">Cancelado</option>
-        </InputSelect>
-    </div>
-
-    <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Detalle</button>
-
-    @if (mostrarFormulario)
+    private void FiltrarProductosPorCategoria(ChangeEventArgs e)
     {
-        <EditForm Model="pedidoDetalle" OnValidSubmit="GuardarDetalle">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-            <div class="form-group">
-                <label for="producto_id">Producto</label>
-                <InputSelect id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id">
-                    @foreach (var prod in productos)
-                    {
-                        <option value="@prod.id">@prod.nombre</option>
-                    }
-                </InputSelect>
-            </div>
-            <input type="hidden" @bind="pedidoDetalle.pedido_id" />
-            <div class="form-group">
-                <label for="cantidad">Cantidad</label>
-                <InputNumber id="cantidad" class="form-control" @bind-Value="pedidoDetalle.cantidad" />
-            </div>
-            <div class="form-group">
-                <button type="submit" class="btn btn-success">Guardar</button>
-                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-            </div>
-        </EditForm>
+        if (int.TryParse(e.Value?.ToString(), out int categoriaId))
+        {
+            categoriaSeleccionada = categoriaId;
+            productosFiltrados = categoriaProductos
+                .Where(cp => cp.categoria_id == categoriaSeleccionada)
+                .Select(cp => productos.FirstOrDefault(p => p.id == cp.producto_id))
+                .Where(p => p != null)
+                .ToList();
+
+            StateHasChanged();
+        }
     }
 
-    <div>
-        <h4>Detalles</h4>
-        @foreach (var detalle in pedidoDetalles)
+    private string getEstadoPedido(int? estado)
+    {
+        string str_estado = "";
+        switch (estado)
         {
-            <div>
-                <p>@detalle.producto.descripcion</p>
-                <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(detalle)">Modificar</button>
-                <button @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
-            </div>
+            case 0:
+                str_estado = "Disponible";
+                break;
+            case 1:
+                str_estado = "Ocupada";
+                break;
+            case 2:
+                str_estado = "Reservada";
+                break;
+            case 3:
+                str_estado = "Limpieza";
+                break;
+            default:
+                str_estado = "Estado desconocido";
+                break;
         }
-    </div>
-}
-else
-{
-    <p>Cargando...</p>
+        return str_estado;
+    }
 }
