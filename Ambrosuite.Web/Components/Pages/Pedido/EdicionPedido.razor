@@ -72,7 +72,6 @@
             <div class="form-group">
                 <label for="cantidad">Cantidad</label>
                 <InputNumber id="cantidad" class="form-control" @bind-Value="pedidoDetalle.cantidad" />
-                <ValidationMessage For="@(() => pedidoDetalle.cantidad)" />
             </div>
             <div class="form-group mt-3">
                 <button type="submit" class="btn btn-success">Guardar</button>
@@ -83,14 +82,30 @@
 
     <div class="mt-4">
         <h4>Detalles</h4>
-        @foreach (var detalle in pedidoDetalles)
-        {
-            <div class="d-flex align-items-center mb-2">
-                <p class="m-0 flex-grow-1">@detalle.producto.descripcion</p>
-                <button class="btn btn-warning btn-sm mx-1" @onclick="() => MostrarFormularioModificar(detalle)">Modificar</button>
-                <button class="btn btn-danger btn-sm" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
-            </div>
-        }
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Cantidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detalle in pedidoDetalles)
+                {
+                    <tr>
+                        <td>@detalle.producto.nombre</td>
+                        <td>@detalle.producto.descripcion</td>
+                        <td>@detalle.cantidad</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm mx-1" @onclick="() => MostrarFormularioModificar(detalle)">Modificar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 }
 else

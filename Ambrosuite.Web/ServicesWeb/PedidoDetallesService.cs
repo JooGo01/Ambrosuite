@@ -71,6 +71,18 @@ namespace Ambrosuite.Web.ServicesWeb
         {
             try
             {
+                // Verificar si el registro ya existe
+                var existingPedidoDetalle = await _httpClient.GetFromJsonAsync<PedidoDetalle>($"/api/pedidodetalles/{p_pedidoDetalle.pedido_id}/{p_pedidoDetalle.producto_id}");
+
+                if (existingPedidoDetalle.id != 0)
+                {
+                    //en caso de que ya exista el registro, se actualiza a estado 0 y cambia la cantidad
+                    p_pedidoDetalle.id = existingPedidoDetalle.id;
+                    p_pedidoDetalle.cantidad += existingPedidoDetalle.cantidad;
+                    updatePedidoDetalleAsync(p_pedidoDetalle);
+                    return;
+                }
+
                 PedidoDetalleCreateUpdateDTO pedidoDetalleCreateUpdateDTO = new PedidoDetalleCreateUpdateDTO
                 {
                     cantidad = p_pedidoDetalle.cantidad,

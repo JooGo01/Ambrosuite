@@ -41,6 +41,22 @@ namespace Ambrosuite.ApiService.Controllers
             return Ok(pedidoDetalleDto);
         }
 
+        [HttpGet("{pedidoId}/{productoId}")]
+        public async Task<ActionResult<PedidoDetalle>> GetPedidoDetalleByPedidoAndProducto(int pedidoId, int productoId)
+        {
+
+            var pedidoDetalle = await _context.PedidoDetalles
+                .Include(pd => pd.producto)
+                .Include(pd => pd.pedido)
+                .FirstOrDefaultAsync(p => p.pedido_id == pedidoId && p.producto_id==productoId);
+
+            if(pedidoDetalle == null)
+            {
+                return Ok(pedidoDetalle= new PedidoDetalle());
+            }
+            return Ok(pedidoDetalle);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<PedidoDetalle>> GetPedidoDetalle(int id)
         {
