@@ -33,7 +33,7 @@
             {
                 <div class="form-group">
                     <label for="categoria_id">Categoría</label>
-                    <InputSelect id="categoria_id" class="form-control" @bind-Value="categoriaSeleccionada" @onchange="FiltrarProductosPorCategoria">
+                    <InputSelect id="categoria_id" class="form-control" @bind-Value="categoriaSeleccionada">
                         <option value="0">Seleccione una categoría</option>
                         @foreach (var categoria in categorias)
                         {
@@ -97,10 +97,21 @@ else
     private List<ProductoFinal> productosFiltrados = new();
     private List<CategoriaProducto> categoriaProductos = new();
     private List<Categoria> categorias = new();
-    private int categoriaSeleccionada = 0;
     private Pedido pedido;
     private bool mostrarFormulario = false;
     private bool esNuevoRegistro = true;
+    private int _categoriaSeleccionada;
+
+    private int categoriaSeleccionada
+    {
+        get => _categoriaSeleccionada;
+        set
+        {
+            _categoriaSeleccionada = value;
+            FiltrarProductosPorCategoria();
+        }
+    }
+
 
     private PedidoDetalle pedidoDetalle = new()
         {
@@ -168,20 +179,25 @@ else
         mostrarFormulario = false;
     }
 
-    private void FiltrarProductosPorCategoria(ChangeEventArgs e)
+    private void FiltrarProductosPorCategoria()
     {
-        if (int.TryParse(e.Value?.ToString(), out int categoriaId))
-        {
-            categoriaSeleccionada = categoriaId;
-            productosFiltrados = categoriaProductos
-                .Where(cp => cp.categoria_id == categoriaSeleccionada)
-                .Select(cp => productos.FirstOrDefault(p => p.id == cp.producto_id))
-                .Where(p => p != null)
-                .ToList();
+        pedidoDetalle.producto_id = 0; // Reinicia la selección del producto
 
-            StateHasChanged();
+        if (categoriaSeleccionada == 0)
+        {
+            productosFiltrados = new List<ProductoFinal>();
+            return;
         }
+
+        productosFiltrados = categoriaProductos
+            .Where(cp => cp.categoria_id == categoriaSeleccionada)
+            .Select(cp => productos.FirstOrDefault(p => p.id == cp.producto_id))
+            .Where(p => p != null)
+            .ToList();
+
+        StateHasChanged();
     }
+
 
     private string getEstadoPedido(int? estado)
     {
