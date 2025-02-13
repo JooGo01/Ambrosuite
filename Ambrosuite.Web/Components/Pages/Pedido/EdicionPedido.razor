@@ -1,0 +1,257 @@
+@page "/editar-pedido/{pedidoId:int}"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.Web.ServicesWeb
+@inject PedidosService PedidoService;
+@inject ProductosService ProductoService;
+@inject PedidoDetalleService PedidoDetalleService;
+@inject CategoriaProductosService CategoriaProductosService;
+@inject CategoriasService CategoriasService;
+@inject NavigationManager Navigation;
+@rendermode InteractiveServer
+
+@if (pedido != null)
+{
+    <h3>Editar Pedido</h3>
+    <div class="form-group">
+        <label>Fecha y Hora: @pedido.fecha_hora</label>
+    </div>
+    <div class="form-group">
+        <label>Total: @pedido.total</label>
+    </div>
+    <div class="form-group">
+        <label>Estado: @getEstadoPedido(pedido.estado)</label>
+    </div>
+
+    <button type="button" class="btn btn-primary my-3" @onclick="MostrarFormularioAgregar">Agregar Detalle</button>
+
+    @if (mostrarFormulario)
+    {
+        <EditForm Model="pedidoDetalle" OnValidSubmit="GuardarDetalle">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            @if (esNuevoRegistro)
+            {
+                <div class="form-group">
+                    <label for="categoria_id">Categoría</label>
+                    <InputSelect id="categoria_id" class="form-control" @bind-Value="categoriaSeleccionada">
+                        <option value="0">Seleccione una categoría</option>
+                        @foreach (var categoria in categorias)
+                        {
+                            <option value="@categoria.id">@categoria.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label for="producto_id">Producto</label>
+                    <InputSelect id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id" disabled="@(productosFiltrados.Count == 0)">
+                        @if (productosFiltrados.Count == 0)
+                        {
+                            <option value="0">Seleccione un producto</option>
+                        }
+                        else
+                        {
+                            @foreach (var prod in productosFiltrados)
+                            {
+                                <option value="@prod.id">@prod.nombre</option>
+
+                            }
+                        }
+                    </InputSelect>
+                </div>
+            }
+            else
+            {
+                <div class="form-group">
+                    <label for="producto">Producto</label>
+                    <InputText id="producto" class="form-control" @bind-Value="pedidoDetalle.producto.nombre" disabled />
+                </div>
+                <InputNumber id="producto_id" class="form-control" @bind-Value="pedidoDetalle.producto_id" hidden />
+            }
+            <input type="hidden" @bind="pedidoDetalle.pedido_id" />
+
+            <div class="form-group">
+                <label for="cantidad">Cantidad</label>
+                <InputNumber id="cantidad" class="form-control" @bind-Value="pedidoDetalle.cantidad" />
+            </div>
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </div>
+        </EditForm>
+    }
+
+    <div class="mt-4">
+        <h4>Detalles</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Cantidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detalle in pedidoDetalles)
+                {
+                    <tr>
+                        <td>@detalle.producto.nombre</td>
+                        <td>@detalle.producto.descripcion</td>
+                        <td>@detalle.cantidad</td>
+                        <td>
+                            <button class="btn btn-warning btn-sm mx-1" @onclick="() => MostrarFormularioModificar(detalle)">Modificar</button>
+                        <button class="btn btn-danger btn-sm" @onclick="() => EliminarDetalle(detalle)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <p>Cargando...</p>
+}
+
+@code {
+    [Parameter] public int pedidoId { get; set; }
+    private List<PedidoDetalle>? pedidoDetalles;
+    private List<ProductoFinal> productos = new();
+    private List<ProductoFinal> productosFiltrados = new();
+    private List<CategoriaProducto> categoriaProductos = new();
+    private List<Categoria> categorias = new();
+    private Pedido pedido;
+    private bool mostrarFormulario = false;
+    private bool esNuevoRegistro = true;
+    private int _categoriaSeleccionada;
+
+    private int categoriaSeleccionada
+    {
+        get => _categoriaSeleccionada;
+        set
+        {
+            _categoriaSeleccionada = value;
+            FiltrarProductosPorCategoria();
+        }
+    }
+
+    private PedidoDetalle pedidoDetalle = new()
+        {
+            pedido_id = 0,
+            producto_id = 0,
+            estado = 0,
+            cantidad = 0,
+        };
+
+    protected override async Task OnInitializedAsync()
+    {
+        pedido = await PedidoService.GetPedidoByIdAsync(pedidoId);
+        pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+        productos = await ProductoService.GetProductosAsync();
+        categorias = await CategoriasService.GetCategoriaAsync();
+        categoriaProductos = await CategoriaProductosService.GetCategoriaProductosAsync();
+    }
+
+    private async Task GuardarDetalle()
+    {
+        pedidoDetalle.pedido_id = pedidoId;
+        if (esNuevoRegistro)
+        {
+            await PedidoDetalleService.agregarPedidoDetalleAsync(pedidoDetalle);
+        }
+        else
+        {
+            await PedidoDetalleService.updatePedidoDetalleAsync(pedidoDetalle);
+        }
+        pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+        mostrarFormulario = false;
+    }
+
+    private async Task EliminarDetalle(PedidoDetalle p_pedidoDetalle)
+    {
+        if (p_pedidoDetalle != null)
+        {
+            await PedidoDetalleService.deletePedidoDetalleAsync(p_pedidoDetalle);
+            pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+        }
+    }
+
+    private void MostrarFormularioModificar(PedidoDetalle p_pedidoDetalle)
+    {
+        pedidoDetalle = p_pedidoDetalle;
+        esNuevoRegistro = false;
+        mostrarFormulario = true;
+    }
+
+    private void MostrarFormularioAgregar()
+    {
+        pedidoDetalle = new PedidoDetalle
+            {
+                pedido_id = pedidoId,
+                producto_id = 0,
+                estado = 0,
+                cantidad = 0,
+            };
+        esNuevoRegistro = true;
+        mostrarFormulario = true;
+
+        if (productosFiltrados.Count > 0)
+        {
+            pedidoDetalle.producto_id = productosFiltrados.First().id;
+        }
+        StateHasChanged(); // Forzar actualización del componente
+    }
+
+    private void Cancelar()
+    {
+        mostrarFormulario = false;
+    }
+
+    private void FiltrarProductosPorCategoria()
+    {
+        // pedidoDetalle.producto_id = 0; Reinicia la selección del producto
+
+        if (categoriaSeleccionada == 0)
+        {
+            productosFiltrados = new List<ProductoFinal>();
+            return;
+        }
+
+        productosFiltrados = categoriaProductos
+            .Where(cp => cp.categoria_id == categoriaSeleccionada)
+            .Select(cp => productos.FirstOrDefault(p => p.id == cp.producto_id))
+            .Where(p => p != null)
+            .ToList();
+
+        if (productosFiltrados.Count > 0)
+        {
+            pedidoDetalle.producto_id = productosFiltrados.First().id;
+        }
+
+        StateHasChanged();
+    }
+
+    private string getEstadoPedido(int? estado)
+    {
+        string str_estado = "";
+        switch (estado)
+        {
+            case 0:
+                str_estado = "Disponible";
+                break;
+            case 1:
+                str_estado = "Ocupada";
+                break;
+            case 2:
+                str_estado = "Reservada";
+                break;
+            case 3:
+                str_estado = "Limpieza";
+                break;
+            default:
+                str_estado = "Estado desconocido";
+                break;
+        }
+        return str_estado;
+    }
+}
