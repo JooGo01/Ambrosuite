@@ -35,7 +35,7 @@ namespace Ambrosuite.ApiService.Controllers
             var pedidoDetalles = await _context.PedidoDetalles
                 .Include(pd => pd.producto)
                 .Include(pd => pd.pedido)
-                .Where(p => p.pedido_id == pedidoId && p.producto.estado==0 && p.estado==0)
+                .Where(p => p.pedido_id == pedidoId && p.producto.estado==0)
                 .ToListAsync();
             var pedidoDetalleDto = _mapper.Map<List<PedidoDetalleDTO>>(pedidoDetalles);
             return Ok(pedidoDetalleDto);

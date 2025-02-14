@@ -28,10 +28,6 @@
                             <button class="btn btn-warning" @onclick="() => EditarPedido(pedidoEnCurso.id)">Editar Pedido</button>
                         </div>
                     }
-                    else
-                    {
-                        <p>No hay pedido en curso</p>
-                    }
                     <div class="modal-actions">
                         <button class="btn btn-primary" @onclick='() => ChangeStatus("Available")' disabled="@(mesa.estado == 0)">Disponible</button>
                         <button class="btn btn-danger" @onclick='() => ChangeStatus("Occupied")' disabled="@(mesa.estado == 1)">Ocupada</button>
