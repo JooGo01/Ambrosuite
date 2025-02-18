@@ -90,6 +90,16 @@ builder.Services.AddHttpClient<AuthService>(client =>
     client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
 });
 
+builder.Services.AddHttpClient<MetodoPagosService>(client =>
+{
+    client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
+});
+
+builder.Services.AddHttpClient<TipoFacturasService>(client =>
+{
+    client.BaseAddress = new Uri(urlHttpClient); // Asegúrate de que la URL sea correcta
+});
+
 builder.Services.AddAuthentication("CookieAuth")
     .AddCookie("CookieAuth", options =>
     {

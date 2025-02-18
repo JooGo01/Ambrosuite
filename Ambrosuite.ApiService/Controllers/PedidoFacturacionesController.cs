@@ -34,7 +34,7 @@ namespace Ambrosuite.ApiService.Controllers
             }
             return Ok(pedidoFacturacion);
         }
-        [HttpGet("pedido/{fpedidoId}")]
+        [HttpGet("pedido/{pedidoId}")]
         public async Task<ActionResult<PedidoFacturacion>> GetPedidoFacturacionByPedido(int pedidoId)
         {
             var pedidoFacturacion = await _context.PedidoFacturaciones.Include(p => p.pedido).Include(p => p.facturacion).FirstOrDefaultAsync(p => p.pedido_id == pedidoId);

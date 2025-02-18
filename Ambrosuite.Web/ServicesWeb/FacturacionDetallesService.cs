@@ -46,7 +46,7 @@ namespace Ambrosuite.Web.ServicesWeb
                 }
 
                 // Enviar la lista de FacturacionDetalleCreateUpdateDTO al servidor
-                var response = await _httpClient.PostAsJsonAsync("/api/FacturacionDetalles", facturacionDetalles);
+                var response = await _httpClient.PostAsJsonAsync("/api/FacturacionDetalles/lista", facturacionDetalles);
                 Debug.WriteLine(response);
                 response.EnsureSuccessStatusCode();
             }
