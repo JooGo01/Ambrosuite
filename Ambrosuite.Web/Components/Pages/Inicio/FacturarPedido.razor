@@ -1,0 +1,83 @@
+﻿@page "/facturar-pedido/{pedidoId:int}"
+@using Ambrosuite.Web.ServicesWeb
+@using Ambrosuite.ApiService.Entities;
+@inject PedidosService pedidosService
+@inject PedidoDetalleService pedidoDetalleService
+@inject FacturacionesService facturacionService
+@inject FacturacionDetalleService facturacionDetalleService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+<PageTitle>Facturar Pedido</PageTitle>
+
+<h3>Facturar Pedido</h3>
+
+@if (pedido == null)
+{
+    <p><em>Cargando...</em></p>
+}
+else
+{
+    <div>
+        <h4>Detalles del Pedido</h4>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detalle in pedidoDetalles)
+                {
+                    <tr>
+                        <td>@detalle.producto.nombre</td>
+                        <td>@detalle.cantidad</td>
+                        <td>@detalle.producto.precio</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <button class="btn btn-primary" @onclick="factPedido">Facturar</button>
+    </div>
+}
+
+@code {
+    [Parameter]
+    public int pedidoId { get; set; }
+
+    private Pedido pedido;
+    private List<PedidoDetalle> pedidoDetalles = new List<PedidoDetalle>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CargarPedido();
+    }
+
+    private async Task CargarPedido()
+    {
+        try
+        {
+            pedido = await pedidosService.GetPedidoByIdAsync(pedidoId);
+            pedidoDetalles = await pedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error cargando el pedido: {ex.Message}");
+        }
+    }
+
+    private async Task factPedido()
+    {
+        try
+        {
+            await facturacionDetalleService.agregarFacturacionDetalleAsync(pedidoDetalles, pedidoId);
+            NavigationManager.NavigateTo("/ambrosuite");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error facturando el pedido: {ex.Message}");
+        }
+    }
+}

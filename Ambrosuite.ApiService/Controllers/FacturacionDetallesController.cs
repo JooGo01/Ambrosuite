@@ -48,6 +48,16 @@ namespace Ambrosuite.ApiService.Controllers
             return Ok(facturacionDetalleResultDto);
         }
 
+        [HttpPost("lista")]
+        public async Task<ActionResult> AddFacturacionDetalleLista(List<FacturacionDetalleCreateUpdateDTO> facturacionDetalleDtos)
+        {
+            var facturacionDetalles = _mapper.Map<List<FacturacionDetalle>>(facturacionDetalleDtos);
+            _context.FacturacionDetalles.AddRange(facturacionDetalles);
+            await _context.SaveChangesAsync();
+            var facturacionDetalleResultDtos = _mapper.Map<List<FacturacionDetalleDTO>>(facturacionDetalles);
+            return Ok(facturacionDetalleResultDtos);
+        }
+
         [HttpPut("{id}")]
         public async Task<ActionResult<FacturacionDetalle>> UpdateFacturacionDetalle(int id, FacturacionDetalleCreateUpdateDTO facturacionDetalleDto)
         {

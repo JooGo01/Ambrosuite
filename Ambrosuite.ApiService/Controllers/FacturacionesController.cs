@@ -46,8 +46,7 @@ namespace Ambrosuite.ApiService.Controllers
             facturacion.fecha_emision = DateTime.Now;
             _context.Facturaciones.Add(facturacion);
             await _context.SaveChangesAsync();
-            var facturacionResultDto = _mapper.Map<FacturacionDTO>(facturacionDto);
-            return Ok(facturacionResultDto);
+            return Ok(facturacion);
         }
 
         [HttpPut("{id}")]
@@ -63,6 +62,28 @@ namespace Ambrosuite.ApiService.Controllers
             await _context.SaveChangesAsync();
             var factuacionActualizadoDto = _mapper.Map<FacturacionDTO>(facturacion);
             return Ok(factuacionActualizadoDto);
+        }
+
+        [HttpGet("ultimo-id")]
+        public async Task<ActionResult<int>> GetUltimoId()
+        {
+            var ultimoId = await _context.Facturaciones.MaxAsync(f => (int?)f.id) ?? 0;
+            return Ok(ultimoId);
+        }
+
+        [HttpGet("ultimo-numero-factura")]
+        public async Task<ActionResult<string>> GetUltimoNumeroFactura()
+        {
+            var ultimoNumeroFactura = await _context.Facturaciones.MaxAsync(f => f.numero_factura);
+            if (ultimoNumeroFactura == null)
+            {
+                return Ok("00000001");
+            }
+            else
+            {
+                var nuevoNumeroFactura = (ultimoNumeroFactura.Value + 1).ToString("D8");
+                return Ok(nuevoNumeroFactura);
+            }
         }
     }
 }
