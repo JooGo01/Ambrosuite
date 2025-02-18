@@ -36,6 +36,25 @@ namespace Ambrosuite.Web.ServicesWeb
                 var response = await _httpClient.PutAsJsonAsync("/api/pedidodetalles/" + p_pedidoDetalle.id, pedidoDetalleCreateUpdateDTO);
                 Debug.WriteLine(response);
                 response.EnsureSuccessStatusCode();
+
+
+                // Calcular el total a partir de los detalles del pedido
+
+                List<PedidoDetalle>? pedido = await _httpClient.GetFromJsonAsync<List<PedidoDetalle>>($"api/pedidodetalles/pedidoAct/{p_pedidoDetalle.pedido_id}");
+                double total = (double)pedido.Sum(detalle => detalle.cantidad * detalle.producto.precio);
+
+                Pedido? ped = await _httpClient.GetFromJsonAsync<Pedido>($"api/pedidos/{p_pedidoDetalle.pedido_id}");
+                ped.total = total;
+
+                PedidoCreateUpdateDTO pedCreateUpdateDTO = new PedidoCreateUpdateDTO {
+                    total = ped.total,
+                    estado = 0,
+                    mesa_id = ped.mesa_id,
+                    usuario_id = ped.usuario_id
+                };
+
+                await _httpClient.PutAsJsonAsync("/api/pedidos/" + p_pedidoDetalle.pedido_id, pedCreateUpdateDTO);
+
             }
             catch (Exception ex)
             {
@@ -59,6 +78,24 @@ namespace Ambrosuite.Web.ServicesWeb
                 var response = await _httpClient.PutAsJsonAsync("/api/pedidodetalles/" + p_pedidoDetalle.id, pedidoDetalleCreateUpdateDTO);
                 Debug.WriteLine(response);
                 response.EnsureSuccessStatusCode();
+
+                // Calcular el total a partir de los detalles del pedido
+
+                List<PedidoDetalle>? pedido = await _httpClient.GetFromJsonAsync<List<PedidoDetalle>>($"api/pedidodetalles/pedidoAct/{p_pedidoDetalle.pedido_id}");
+                double total = (double)pedido.Sum(detalle => detalle.cantidad * detalle.producto.precio);
+
+                Pedido? ped = await _httpClient.GetFromJsonAsync<Pedido>($"api/pedidos/{p_pedidoDetalle.pedido_id}");
+                ped.total = total;
+
+                PedidoCreateUpdateDTO pedCreateUpdateDTO = new PedidoCreateUpdateDTO
+                {
+                    total = ped.total,
+                    estado = 0,
+                    mesa_id = ped.mesa_id,
+                    usuario_id = ped.usuario_id
+                };
+
+                await _httpClient.PutAsJsonAsync("/api/pedidos/" + p_pedidoDetalle.pedido_id, pedCreateUpdateDTO);
             }
             catch (Exception ex)
             {
@@ -94,6 +131,24 @@ namespace Ambrosuite.Web.ServicesWeb
                 var response = await _httpClient.PostAsJsonAsync("/api/pedidodetalles/", pedidoDetalleCreateUpdateDTO);
                 Debug.WriteLine(response);
                 response.EnsureSuccessStatusCode();
+
+                // Calcular el total a partir de los detalles del pedido
+
+                List<PedidoDetalle>? pedido = await _httpClient.GetFromJsonAsync<List<PedidoDetalle>>($"api/pedidodetalles/pedidoAct/{p_pedidoDetalle.pedido_id}");
+                double total = (double)pedido.Sum(detalle => detalle.cantidad * detalle.producto.precio);
+
+                Pedido? ped = await _httpClient.GetFromJsonAsync<Pedido>($"api/pedidos/{p_pedidoDetalle.pedido_id}");
+                ped.total = total;
+
+                PedidoCreateUpdateDTO pedCreateUpdateDTO = new PedidoCreateUpdateDTO
+                {
+                    total = ped.total,
+                    estado = 0,
+                    mesa_id = ped.mesa_id,
+                    usuario_id = ped.usuario_id
+                };
+
+                await _httpClient.PutAsJsonAsync("/api/pedidos/" + p_pedidoDetalle.pedido_id, pedCreateUpdateDTO);
             }
             catch (Exception ex)
             {
