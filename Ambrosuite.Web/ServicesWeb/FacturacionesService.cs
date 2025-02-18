@@ -26,10 +26,17 @@ namespace Ambrosuite.Web.ServicesWeb
                 ultimoNumeroFacturaResponse.EnsureSuccessStatusCode();
                 var ultimoNumeroFactura = await ultimoNumeroFacturaResponse.Content.ReadAsStringAsync();
 
+                var pedidoDetallesResponse = await _httpClient.GetAsync($"/api/PedidoDetalles/pedidoAct/{pedidoId}");
+                pedidoDetallesResponse.EnsureSuccessStatusCode();
+                var pedidoDetalles = await pedidoDetallesResponse.Content.ReadFromJsonAsync<List<PedidoDetalle>>();
+
+                // Calcular el total a partir de los detalles del pedido
+                double total = (double)pedidoDetalles.Sum(detalle => detalle.cantidad * detalle.producto.precio);
+
                 FacturacionCreateUpdateDTO facturacionCreateUpdateDTO = new FacturacionCreateUpdateDTO
                 {
                     fecha_emision = p_facturacion.fecha_emision,
-                    total = p_facturacion.total,
+                    total = total,
                     punto_venta = p_facturacion.punto_venta,
                     numero_factura = int.Parse(ultimoNumeroFactura),
                     metodo_pago_id= p_facturacion.metodo_pago_id,

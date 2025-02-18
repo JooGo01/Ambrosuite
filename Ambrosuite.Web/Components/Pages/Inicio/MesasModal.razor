@@ -25,10 +25,10 @@
                             <p><strong>Estado:</strong> @estadoActualDePedido(pedidoEnCurso)</p>
                             <p><strong>Usuario:</strong> @pedidoEnCurso.usuario.nombre @pedidoEnCurso.usuario.apellido</p>
                             <NavLink class="btn btn-info" href="@($"/pedido/{pedidoEnCurso.id}")">Ver Detalle del Pedido</NavLink>
-							@if (pedidoEnCurso.estado == 0)
-							{
-								<button class="btn btn-danger" @onclick="() => EditarPedido(pedidoEnCurso.id)">Facturar Pedido</button>
-							})
+                            @if (pedidoEnCurso.estado == 0)
+                            {
+                                <button class="btn btn-danger" @onclick="() => EditarPedido(pedidoEnCurso.id)">Facturar Pedido</button>
+                            })
                             <button class="btn btn-warning" @onclick="() => EditarPedido(pedidoEnCurso.id)">Editar Pedido</button>
                         </div>
                     }
@@ -113,5 +113,9 @@
     private void EditarPedido(int pedidoId)
     {
         Navigation.NavigateTo($"/editar-pedido/{pedidoId}");
+    }
+
+    private void FactPedido(int pedidoId) { 
+        Navigation.NavigateTo($"/facturar-pedido/{pedidoId}");
     }
 }

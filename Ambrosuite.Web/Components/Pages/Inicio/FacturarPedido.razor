@@ -5,6 +5,8 @@
 @inject PedidoDetalleService pedidoDetalleService
 @inject FacturacionesService facturacionService
 @inject FacturacionDetalleService facturacionDetalleService
+@inject MetodoPagosService metodoPagoService
+@inject TipoFacturasService tipoFacturaService
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
@@ -14,11 +16,43 @@
 
 @if (pedido == null)
 {
-    <p><em>Cargando...</em></p>
+    <div class="loading-container">
+        <div class="spinner"></div>
+        <p>Cargando mesas...</p>
+    </div>
 }
 else
 {
     <div>
+        <EditForm Model="facturacion" OnValidSubmit="factPedido">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+
+            <div class="form-group">
+                <label for="tipo_factura_id">Tipo Factura</label>
+                <InputSelect id="tipo_factura_id" class="form-control" @bind-Value="facturacion.tipo_factura_id">
+                    @foreach (var tipoFactura in tiposFactura)
+                    {
+                        <option value="@tipoFactura.id">@tipoFactura.nombre_tipo - @tipoFactura.descripcion </option>
+                    }
+                </InputSelect>
+            </div>
+            <div class="form-group">
+                <label for="producto_id">Metodo de pago</label>
+                <InputSelect id="metodo_pago_id" class="form-control" @bind-Value="facturacion.metodo_pago_id">
+                    @foreach (var metodoPago in metodosPago)
+                    {
+                        <option value="@metodoPago.id">@metodoPago.descripcion</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="form-group mt-3">
+                <button type="submit" class="btn btn-primary">Facturar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </div>
+        </EditForm>
+
         <h4>Detalles del Pedido</h4>
         <table class="table">
             <thead>
@@ -39,7 +73,6 @@ else
                 }
             </tbody>
         </table>
-        <button class="btn btn-primary" @onclick="factPedido">Facturar</button>
     </div>
 }
 
@@ -47,8 +80,21 @@ else
     [Parameter]
     public int pedidoId { get; set; }
 
-    private Pedido pedido;
-    private List<PedidoDetalle> pedidoDetalles = new List<PedidoDetalle>();
+    public Pedido pedido;
+    public List<PedidoDetalle> pedidoDetalles = new List<PedidoDetalle>();
+    public List<MetodoPago> metodosPago = new List<MetodoPago>();
+    public List<TipoFactura> tiposFactura = new List<TipoFactura>();
+
+    private Facturacion facturacion = new() 
+    { 
+        fecha_emision = DateTime.Now,
+        punto_venta=0,
+        numero_factura=0,
+        total=0,
+        estado=0,
+        metodo_pago_id=0,
+        tipo_factura_id=0
+    };
 
     protected override async Task OnInitializedAsync()
     {
@@ -61,6 +107,8 @@ else
         {
             pedido = await pedidosService.GetPedidoByIdAsync(pedidoId);
             pedidoDetalles = await pedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+            metodosPago = await metodoPagoService.GetMetodoPagoAsync();
+            tiposFactura = await tipoFacturaService.GetTipoFacturaAsync();
         }
         catch (Exception ex)
         {
@@ -72,6 +120,10 @@ else
     {
         try
         {
+            facturacion.fecha_emision = DateTime.Now;
+			facturacion.punto_venta = 1;
+
+            await facturacionService.agregarFacturacionAsync(facturacion, pedidoId);
             await facturacionDetalleService.agregarFacturacionDetalleAsync(pedidoDetalles, pedidoId);
             NavigationManager.NavigateTo("/ambrosuite");
         }
@@ -79,5 +131,10 @@ else
         {
             Console.WriteLine($"Error facturando el pedido: {ex.Message}");
         }
+    }
+
+    private void Cancelar()
+    {
+        NavigationManager.NavigateTo($"/ambrosuite");
     }
 }
