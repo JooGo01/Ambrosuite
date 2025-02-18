@@ -171,6 +171,7 @@ else
             await PedidoDetalleService.updatePedidoDetalleAsync(pedidoDetalle);
         }
         pedidoDetalles = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
+        pedido = await PedidoService.GetPedidoByIdAsync(pedidoId);
         mostrarFormulario = false;
     }
 

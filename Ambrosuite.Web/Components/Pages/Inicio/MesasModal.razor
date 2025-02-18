@@ -24,12 +24,12 @@
                             <p><strong>Total:</strong> @pedidoEnCurso.total?.ToString("C")</p>
                             <p><strong>Estado:</strong> @estadoActualDePedido(pedidoEnCurso)</p>
                             <p><strong>Usuario:</strong> @pedidoEnCurso.usuario.nombre @pedidoEnCurso.usuario.apellido</p>
-                            <NavLink class="btn btn-info" href="@($"/pedido/{pedidoEnCurso.id}")">Ver Detalle del Pedido</NavLink>
                             <button class="btn btn-warning" @onclick="() => EditarPedido(pedidoEnCurso.id)">Editar Pedido</button>
-                            @if (pedidoEnCurso.estado == 0)
+                            <NavLink class="btn btn-info" href="@($"/pedido/{pedidoEnCurso.id}")">Ver Detalle del Pedido</NavLink>
+                            @if (mesa.estado == 1)
                             {
+                                <button class="btn btn-danger" @onclick="() => FactPedido(pedidoEnCurso.id)">Facturar</button>
                             }
-                            <button class="btn btn-danger" @onclick="() => FactPedido(pedidoEnCurso.id)">Facturar Pedido</button>
                         </div>
                     }
                     <div class="modal-actions">

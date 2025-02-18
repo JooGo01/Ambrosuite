@@ -125,7 +125,7 @@ else
 
             await facturacionService.agregarFacturacionAsync(facturacion, pedidoId);
             await facturacionDetalleService.agregarFacturacionDetalleAsync(pedidoDetalles, pedidoId);
-            NavigationManager.NavigateTo($"/ambrosuite");
+            NavigationManager.NavigateTo($"/pedido/{pedidoId}");
         }
         catch (Exception ex)
         {
