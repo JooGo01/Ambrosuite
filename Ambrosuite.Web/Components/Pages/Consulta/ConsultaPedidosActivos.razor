@@ -1,0 +1,147 @@
+﻿@page "/pedidos-activos"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.Web.ServicesWeb
+@inject PedidosService PedidoService
+@inject PedidoDetalleService PedidoDetalleService
+@inject RecetaService RecetaService
+@rendermode InteractiveServer
+
+<h3 class="mb-4">Pedidos Activos</h3>
+
+@if (pedidosActivos == null)
+{
+    <p>Cargando pedidos...</p>
+}
+else
+{
+    if (!pedidosActivos.Any())
+    {
+        <p>No hay pedidos activos.</p>
+    }
+    else
+    {
+        <div class="container">
+            <div class="row">
+                @foreach (var pedido in pedidosActivos)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-white bg-primary" @onclick="() => MostrarModal(pedido)">
+                            <div class="card-header">Pedido #: @pedido.id</div>
+                            <div class="card-body">
+                                <p class="card-text"><strong>Total:</strong> @pedido.total</p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+<!-- Modal -->
+@if (pedidoSeleccionado != null)
+{
+    <div class="modal show d-block" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Detalles del Pedido #: @pedidoSeleccionado.id</h5>
+                    <button type="button" class="btn-close" @onclick="CerrarModal"></button>
+                </div>
+                <div class="modal-body">
+                    @if (productosPedido == null)
+                    {
+                        <p>Cargando detalles del pedido...</p>
+                    }
+                    else
+                    {
+                        <div class="container">
+                            <div class="row">
+                                @foreach (var item in productosPedido)
+                                {
+                                    <div class="col-md-6 mb-4">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h5>@item.producto.nombre</h5>
+                                            </div>
+                                            <div class="card-body">
+                                                @if (item.producto.recetas == null)
+                                                {
+                                                    <p>Cargando recetas...</p>
+                                                }
+                                                else if (item.producto.recetas.Any())
+                                                {
+                                                    <ul class="list-group list-group-flush">
+                                                        @foreach (var receta in item.producto.recetas)
+                                                        {
+                                                            <li class="list-group-item">
+                                                                <strong>Ingrediente:</strong> @receta.ingrediente.nombre<br />
+                                                                <strong>Descripción:</strong> @receta.descripcion<br />
+                                                                <strong>Cantidad:</strong> @receta.cantidad
+                                                            </li>
+                                                        }
+                                                    </ul>
+                                                }
+                                                else
+                                                {
+                                                    <p>Receta no disponible</p>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private List<Pedido> pedidosActivos;
+    private List<PedidoDetalle> productosPedido;
+    private Pedido pedidoSeleccionado;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pedidosActivos = await PedidoService.GetPedidosByActivosAsync();
+    }
+
+    private async Task MostrarModal(Pedido pedido)
+    {
+        pedidoSeleccionado = pedido;
+        productosPedido = await PedidoDetalleService.GetDetallePedidoByIdAsync(pedido.id);
+        foreach (var item in productosPedido)
+        {
+            item.producto.recetas = await RecetaService.GetRecetaProductoAsync(item.producto_id);
+        }
+        StateHasChanged(); // Forzar la actualización del componente
+    }
+
+    private void CerrarModal()
+    {
+        pedidoSeleccionado = null;
+        productosPedido = null;
+    }
+}
+
+<style>
+    .card {
+        margin-bottom: 1rem;
+    }
+
+    .list-group-item {
+        border: none;
+        padding: 0.5rem 1rem;
+    }
+
+    .modal-body {
+        max-height: 70vh;
+        overflow-y: auto;
+    }
+</style>
