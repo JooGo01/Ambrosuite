@@ -4,6 +4,7 @@ using Ambrosuite.ApiService.EntitiesDTO;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace Ambrosuite.ApiService.Controllers
 {
@@ -78,6 +79,53 @@ namespace Ambrosuite.ApiService.Controllers
             await _context.SaveChangesAsync();
             var inventarioActualizadoDto = _mapper.Map<InventarioDTO>(inventario);
             return Ok(inventarioActualizadoDto);
+        }
+
+        [HttpGet("alerta-ingredientes")]
+        public async Task<ActionResult<List<IngredienteConStockDTO>>> GetIngredientesConAlerta()
+        {
+            try
+            {
+                // Obtener todos los ingredientes
+                var ingredientes = await _context.Ingredientes
+                    .Where(i => i.alertaCantidad.HasValue && i.estado == 0) // Asegurarse de que alertaCantidad no sea nulo
+                    .ToListAsync();
+
+                // Obtener todos los inventarios
+                var inventarios = await _context.Inventarios.ToListAsync();
+
+                // Agrupar inventarios por ingrediente y calcular el stock total
+                var inventarioAgrupado = inventarios
+                    .GroupBy(i => i.ingrediente_id)
+                    .Select(g => new
+                    {
+                        IngredienteId = g.Key,
+                        StockTotal = g.Sum(i => i.stock ?? 0)
+                    })
+                    .ToDictionary(x => x.IngredienteId, x => x.StockTotal);
+
+                // Crear la lista de DTOs con la información de ingredientes y stock
+                var ingredientesConAlerta = ingredientes
+                    .Select(i => new IngredienteConStockDTO
+                    {
+                        Id = i.id,
+                        Nombre = i.nombre,
+                        Descripcion = i.descripcion,
+                        Marca = i.marca,
+                        AlertaCantidad = i.alertaCantidad,
+                        StockTotal = inventarioAgrupado.TryGetValue(i.id, out var stockTotal) ? stockTotal : 0
+                    })
+                    .Where(i => i.StockTotal <= i.AlertaCantidad)
+                    .ToList();
+
+                return Ok(ingredientesConAlerta);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception (you can use a logging framework here)
+                Debug.WriteLine(ex.Message);
+                return StatusCode(StatusCodes.Status500InternalServerError, "Error al obtener los ingredientes con alerta");
+            }
         }
 
         [HttpPost("{pedidoId}/actualizarstock")]
