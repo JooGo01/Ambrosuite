@@ -92,5 +92,20 @@ namespace Ambrosuite.ApiService.Controllers
             var pedidoActualizadoDto = _mapper.Map<PedidoDTO>(pedido);
             return Ok(pedidoActualizadoDto);
         }
+
+        [HttpPut("estadoPedido/{id}")]
+        public async Task<ActionResult<Pedido>> UpdatePedidoFacturado(int id, PedidoCreateUpdateDTO pedidoDto)
+        {
+            var pedido = await _context.Pedidos.FirstOrDefaultAsync(p => p.id == id);
+            if (pedido == null)
+            {
+                return NotFound("Pedido no encontrado");
+            }
+
+            _mapper.Map(pedidoDto, pedido);
+            await _context.SaveChangesAsync();
+            var pedidoActualizadoDto = _mapper.Map<PedidoDTO>(pedido);
+            return Ok(pedidoActualizadoDto);
+        }
     }
 }

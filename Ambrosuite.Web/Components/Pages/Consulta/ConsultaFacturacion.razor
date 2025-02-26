@@ -1,0 +1,103 @@
+﻿@page "/consulta-facturacion"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.Web.ServicesWeb
+@using Microsoft.AspNetCore.Components.Forms
+@inject FacturacionesService FacturacionesService
+@rendermode InteractiveServer
+
+<h3 class="mb-4">Consulta de Facturación</h3>
+
+<!-- Filtros -->
+<div class="mb-3">
+    <InputRadioGroup TValue="string" @bind-Value="filtroSeleccionado">
+        <div class="form-check">
+            <InputRadio TValue="string" class="form-check-input" id="filtroDia" Value="@("dia")" />
+            <label class="form-check-label" for="filtroDia">Día</label>
+        </div>
+        <div class="form-check">
+            <InputRadio TValue="string" class="form-check-input" id="filtroMes" Value="@("mes")" />
+            <label class="form-check-label" for="filtroMes">Mes</label>
+        </div>
+        <div class="form-check">
+            <InputRadio TValue="string" class="form-check-input" id="filtroAnio" Value="@("anio")" />
+            <label class="form-check-label" for="filtroAnio">Año</label>
+        </div>
+    </InputRadioGroup>
+
+    @if (filtroSeleccionado == "dia")
+    {
+        <label for="filtroDiaInput">Día:</label>
+        <input type="date" @bind="filtroDia" class="form-control" id="filtroDiaInput" />
+    }
+    else if (filtroSeleccionado == "mes")
+    {
+        <label for="filtroMesInput">Mes:</label>
+        <input type="month" @bind="filtroMes" class="form-control" id="filtroMesInput" />
+    }
+    else if (filtroSeleccionado == "anio")
+    {
+        <label for="filtroAnioInput">Año:</label>
+        <input type="number" @bind="filtroAnio" class="form-control" id="filtroAnioInput" min="2000" max="2100" />
+    }
+</div>
+
+<button class="btn btn-primary" @onclick="Consultar">Consultar</button>
+
+@if (facturas == null)
+{
+    <p>Realice una consulta para ver las facturas.</p>
+}
+else if (!facturas.Any())
+{
+    <p>No se encontraron facturas para los filtros seleccionados.</p>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            @foreach (var factura in facturas)
+            {
+                <div class="col-md-3 mb-4">
+                    <div class="card text-white bg-secondary">
+                        <div class="card-header">Factura: @factura.id</div>
+                        <div class="card-body">
+                            <h5 class="card-title">@factura.numero_factura</h5>
+                            <p class="card-text"><strong>Total:</strong> @factura.total</p>
+                            <p class="card-text"><small><strong>Fecha:</strong> @factura.fecha_emision</small></p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <h4>Resumen</h4>
+        <p><strong>Total Facturado:</strong> @facturas.Sum(f => f.total)</p>
+        <p><strong>Cantidad de Facturas:</strong> @facturas.Count</p>
+    </div>
+}
+
+@code {
+    private List<Facturacion> facturas;
+    private string filtroSeleccionado = "dia";
+    private DateTime? filtroDia;
+    private DateTime? filtroMes;
+    private int? filtroAnio;
+
+    private async Task Consultar()
+    {
+        switch (filtroSeleccionado)
+        {
+            case "dia":
+                facturas = await FacturacionesService.GetFacturasAsync(filtroDia, null, null);
+                break;
+            case "mes":
+                facturas = await FacturacionesService.GetFacturasAsync(null, filtroMes, null);
+                break;
+            case "anio":
+                facturas = await FacturacionesService.GetFacturasAsync(null, null, filtroAnio);
+                break;
+        }
+    }
+}

@@ -85,5 +85,31 @@ namespace Ambrosuite.ApiService.Controllers
                 return Ok(nuevoNumeroFactura);
             }
         }
+
+        [HttpGet("filtro-consulta")]
+        public async Task<ActionResult<List<Facturacion>>> GetFacturaciones([FromQuery] DateTime? dia, [FromQuery] DateTime? mes, [FromQuery] int? anio)
+        {
+            var query = _context.Facturaciones.Include(f => f.tipoFactura).Include(f => f.metodoPago).AsQueryable();
+
+            if (dia.HasValue)
+            {
+                query = query.Where(f => f.fecha_emision.Value.Date == dia.Value.Date);
+            }
+
+            if (mes.HasValue)
+            {
+                query = query.Where(f => f.fecha_emision.Value.Year == mes.Value.Year && f.fecha_emision.Value.Month == mes.Value.Month);
+            }
+
+            if (anio.HasValue)
+            {
+                query = query.Where(f => f.fecha_emision.Value.Year == anio.Value);
+            }
+
+            var facturaciones = await query.ToListAsync();
+
+            return Ok(facturaciones);
+        }
+
     }
 }

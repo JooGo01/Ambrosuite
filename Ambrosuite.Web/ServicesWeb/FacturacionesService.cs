@@ -55,6 +55,24 @@ namespace Ambrosuite.Web.ServicesWeb
                     facturacion_id = facturacion.id
                 };
 
+                if (facturacion.id > 0) { 
+                    var pedidoResponse = await _httpClient.GetAsync($"/api/Pedidos/{pedidoId}");
+                    pedidoResponse.EnsureSuccessStatusCode();
+                    var pedido = await pedidoResponse.Content.ReadFromJsonAsync<Pedido>();
+
+                    PedidoCreateUpdateDTO pedidoDto = new PedidoCreateUpdateDTO
+                    {
+                        mesa_id = pedido.mesa_id,
+                        usuario_id = pedido.usuario_id,
+                        total = total,
+                        estado = 1
+                    };
+
+                    var responsePedido = await _httpClient.PutAsJsonAsync($"/api/Pedidos/{pedidoId}", pedidoDto);
+                    Debug.WriteLine(responsePedido);
+                    responsePedido.EnsureSuccessStatusCode();
+                }
+
                 var responsePedidoFacturacion = await _httpClient.PostAsJsonAsync("/api/PedidoFacturaciones", pedidoFacturacion);
                 Debug.WriteLine(responsePedidoFacturacion);
                 responsePedidoFacturacion.EnsureSuccessStatusCode();
@@ -64,6 +82,33 @@ namespace Ambrosuite.Web.ServicesWeb
                 Console.WriteLine($"Error updating table: {ex.Message}");
                 throw;
             }
+        }
+
+        public async Task<List<Facturacion>> GetFacturasAsync(DateTime? dia, DateTime? mes, int? anio)
+        {
+            var query = new List<string>();
+
+            if (dia.HasValue)
+            {
+                query.Add($"dia={dia.Value.ToString("yyyy-MM-dd")}");
+            }
+
+            if (mes.HasValue)
+            {
+                query.Add($"mes={mes.Value.ToString("yyyy-MM")}");
+            }
+
+            if (anio.HasValue)
+            {
+                query.Add($"anio={anio.Value}");
+            }
+
+            var queryString = string.Join("&", query);
+            var response = await _httpClient.GetAsync($"api/Facturaciones/filtro-consulta?{queryString}");
+
+            response.EnsureSuccessStatusCode();
+
+            return await response.Content.ReadFromJsonAsync<List<Facturacion>>();
         }
     }
 }
