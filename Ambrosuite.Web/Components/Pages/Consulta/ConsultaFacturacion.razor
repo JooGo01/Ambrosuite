@@ -53,22 +53,28 @@ else if (!facturas.Any())
 }
 else
 {
-    <div class="container">
-        <div class="row">
-            @foreach (var factura in facturas)
-            {
-                <div class="col-md-3 mb-4">
-                    <div class="card text-white bg-secondary">
-                        <div class="card-header">Factura: @factura.id</div>
-                        <div class="card-body">
-                            <h5 class="card-title">@factura.numero_factura</h5>
-                            <p class="card-text"><strong>Total:</strong> @factura.total</p>
-                            <p class="card-text"><small><strong>Fecha:</strong> @factura.fecha_emision</small></p>
-                        </div>
-                    </div>
-                </div>
-            }
-        </div>
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Número de Factura</th>
+                    <th>Total</th>
+                    <th>Fecha de Emisión</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var factura in facturas)
+                {
+                    <tr>
+                        <td>@factura.id</td>
+                        <td>@factura.numero_factura</td>
+                        <td>@factura.total</td>
+                        <td>@factura.fecha_emision</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
     </div>
 
     <div class="mt-4">
