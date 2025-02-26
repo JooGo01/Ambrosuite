@@ -24,4 +24,10 @@
     <ProjectReference Include="..\Ambrosuite.ServiceDefaults\Ambrosuite.ServiceDefaults.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Update="Components\Pages\Consulta\ConsultaAlertaStock.razor">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+    </Content>
+  </ItemGroup>
+
 </Project>

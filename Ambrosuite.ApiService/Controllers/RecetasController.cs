@@ -43,6 +43,13 @@ namespace Ambrosuite.ApiService.Controllers
             return Ok(recetas);
         }
 
+        [HttpGet("producto/{productoId}")]
+        public async Task<ActionResult<List<Receta>>> GetRecetaByProductoId(int productoId)
+        {
+            var recetas = await _context.Recetas.Include(p => p.ingrediente).Include(p => p.producto_final).Where(p => p.estado == 0 && p.producto_final_id == productoId).ToListAsync();
+            return Ok(recetas);
+        }
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Receta>> GetReceta(int id)
         {

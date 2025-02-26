@@ -31,6 +31,23 @@ namespace Ambrosuite.Web.ServicesWeb
             }
         }
 
+        public async Task<List<IngredienteConStockDTO>> GetAlertaIngredienteAsync()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync("api/Inventarios/alerta-ingredientes");
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadFromJsonAsync<List<IngredienteConStockDTO>>();
+            }
+            catch (HttpRequestException ex)
+            {
+                // Registrar el error
+                Console.Error.WriteLine($"Error al obtener la alerta de ingredientes: {ex.Message}");
+                // Puedes lanzar una excepción personalizada o manejar el error de otra manera
+                throw new Exception("Error al obtener la alerta de ingredientes", ex);
+            }
+        }
+
         public async Task updateInventarioAsync(Inventario p_inventario)
         {
             try

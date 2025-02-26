@@ -1,0 +1,59 @@
+﻿@page "/alerta-inventario"
+@using Ambrosuite.ApiService.Entities
+@using Ambrosuite.ApiService.EntitiesDTO
+@using Ambrosuite.Web.ServicesWeb
+@inject InventarioService InventarioService
+@rendermode InteractiveServer
+
+<h3 class="mb-4">Alerta de Stock de Ingredientes</h3>
+
+<!-- Textbox para filtrar -->
+<div class="mb-3">
+    <input type="text" @bind="filtro" @bind:event="oninput" class="form-control" placeholder="Filtrar por ingrediente..." />
+</div>
+
+@if (ingredienteConStock == null)
+{
+    <p>Cargando inventario...</p>
+}
+else
+{
+    var inventarioFiltrado = string.IsNullOrWhiteSpace(filtro)
+        ? ingredienteConStock
+        : ingredienteConStock.Where(i => i.Nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)).ToList();
+
+    if (!inventarioFiltrado.Any())
+    {
+        <p>No hay stock disponible.</p>
+    }
+    else
+    {
+        <div class="container">
+            <div class="row">
+                @foreach (var item in inventarioFiltrado)
+                {
+                    <div class="col-md-3 mb-4">
+                        <div class="card text-white bg-secondary">
+                            <div class="card-header">Nombre: @item.Nombre</div>
+                            <div class="card-body">
+                                <p class="card-text"><strong>Descripcion:</strong> @item.Descripcion</p>
+                                <p class="card-text"><small><strong>Stock:</strong> @item.AlertaCantidad</small></p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+}
+
+@code {
+    private List<IngredienteConStockDTO> ingredienteConStock;
+    private string filtro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        ingredienteConStock = await InventarioService.GetAlertaIngredienteAsync();
+        ingredienteConStock = ingredienteConStock.OrderBy(i => i.StockTotal).ToList();
+    }
+}

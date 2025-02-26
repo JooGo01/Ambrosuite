@@ -29,6 +29,21 @@ namespace Ambrosuite.Web.ServicesWeb
             }
         }
 
+        public async Task<List<Receta>> GetRecetaProductoAsync(int productoId)
+        {
+            try
+            {
+                List<Receta> recetas = new List<Receta>();
+                recetas = await _httpClient.GetFromJsonAsync<List<Receta>>("/api/Recetas/producto/" + productoId) ?? new List<Receta>();
+                return recetas;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error fetching receta: {ex.Message}");
+                throw;
+            }
+        }
+
         public async Task updateRecetaAsync(Receta p_receta)
         {
             try
