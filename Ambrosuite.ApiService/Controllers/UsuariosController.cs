@@ -58,6 +58,23 @@ namespace Ambrosuite.ApiService.Controllers
             return Ok(new { token });
         }
 
+        [HttpPost("loginMobile")]
+        public async Task<IActionResult> LoginMobile([FromBody] LoginDTO loginDTO)
+        {
+            var usuario = await _usuarioService.LoginAsync(loginDTO.email, loginDTO.contrasenia);
+
+            if (usuario == null)
+            {
+                return Unauthorized(new { mensaje = "Credenciales incorrectas" });
+            }
+
+            //return Ok(usuario);
+            // Si el usuario es válido, generar el token
+            //var token = _tokenService.GenerateToken(usuario);
+
+            return Ok(usuario);
+        }
+
         [HttpGet]
         public async Task<ActionResult<List<Usuario>>> GetAllUsuariosActivos() {
             //var usuarios = await _context.Usuarios.ToListAsync();

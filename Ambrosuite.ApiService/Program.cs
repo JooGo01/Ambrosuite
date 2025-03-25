@@ -22,12 +22,24 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
     });
 });
 
+/*
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowLocalhost",
         builder => builder.WithOrigins("http://localhost:2215")
                           .AllowAnyHeader()
                           .AllowAnyMethod());
+});
+*/
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
 });
 
 // Add service defaults & Aspire components.
@@ -83,11 +95,12 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
+app.UseCors("AllowAllOrigins");
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
-app.UseCors("AllowLocalhost");
 
 app.MapControllers();
 
