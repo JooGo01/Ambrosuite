@@ -12,12 +12,21 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
-
+/*
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.ListenAnyIP(5000); // Puerto para HTTP
     serverOptions.ListenAnyIP(5001, listenOptions =>  // Puerto para HTTPS
     {
+        listenOptions.UseHttps();
+    });
+});
+*/
+
+builder.WebHost.ConfigureKestrel(serverOptions =>
+{
+    serverOptions.Listen(System.Net.IPAddress.Any, 5000);
+    serverOptions.Listen(System.Net.IPAddress.Any, 5001, listenOptions => {
         listenOptions.UseHttps();
     });
 });
@@ -33,7 +42,7 @@ builder.Services.AddCors(options =>
 */
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins",
+    options.AddPolicy("AllowAll",
         policy =>
         {
             policy.AllowAnyOrigin()
@@ -95,7 +104,7 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
 
-app.UseCors("AllowAllOrigins");
+app.UseCors("AllowAll");
 
 app.UseHttpsRedirection();
 
