@@ -34,7 +34,12 @@ namespace Ambrosuite.ApiService.Controllers
                 return Unauthorized(new { message = "Credenciales incorrectas" });
             }
 
-            return Ok(new { message = "Login exitoso" });
+            return Ok(new
+            {
+                message = "Login exitoso",
+                token = "ambrosuite-static-token"
+            });
+
         }
     }
 }
