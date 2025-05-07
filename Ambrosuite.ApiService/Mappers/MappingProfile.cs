@@ -60,7 +60,8 @@ namespace Ambrosuite.ApiService.Mappers
             // PedidoDetalle
             CreateMap<PedidoDetalle, PedidoDetalleDTO>()
                 .ForMember(dest => dest.producto_id, opt => opt.MapFrom(src => src.producto.id))
-                .ForMember(dest => dest.pedido_id, opt => opt.MapFrom(src => src.pedido.id));
+                .ForMember(dest => dest.pedido_id, opt => opt.MapFrom(src => src.pedido.id))
+                .ForMember(dest => dest.nombreProducto, opt => opt.MapFrom(src => src.producto.nombre));
             CreateMap<PedidoDetalleDTO, PedidoDetalle>();
             CreateMap<PedidoDetalleCreateUpdateDTO, PedidoDetalle>();
 

@@ -8,7 +8,9 @@
         public int? cantidad { get; set; }
         public int? estado { get; set; }
 
-        public ProductoFinalDTO Producto { get; set; }
+        public string nombreProducto { get; set; }
+
+        public ProductoFinalDTO Producto { get; set; }  
         public PedidoDTO Pedido { get; set; }
     }
 }
