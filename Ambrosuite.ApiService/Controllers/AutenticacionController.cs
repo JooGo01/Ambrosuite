@@ -36,6 +36,8 @@ namespace Ambrosuite.ApiService.Controllers
 
             return Ok(new
             {
+                usuario.id,
+                usuario.rol_id,
                 message = "Login exitoso",
                 token = "ambrosuite-static-token"
             });
