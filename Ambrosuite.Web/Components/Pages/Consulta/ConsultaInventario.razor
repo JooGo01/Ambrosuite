@@ -4,48 +4,56 @@
 @inject InventarioService InventarioService
 @rendermode InteractiveServer
 
-<h3 class="mb-4">Inventario</h3>
+<div class="home-background">
+    <div class="overlay text-center text-white d-flex flex-column justify-content-center align-items-center">
+        <div class="card bg-dark bg-opacity-75 border-0 rounded-4 mt-4 p-4 shadow">
+            <h5 class="card-title fw-bold">Inventario</h5>
 
-<!-- Textbox para filtrar -->
-<div class="mb-3">
-    <input type="text" @bind="filtro" @bind:event="oninput" class="form-control" placeholder="Filtrar por ingrediente..." />
-</div>
+            <!-- Textbox para filtrar -->
+            <div class="mb-3">
+                <input type="text" @bind="filtro" @bind:event="oninput" class="form-control" placeholder="Filtrar por ingrediente..." />
+            </div>
+        </div>
+        <div class="m-5">
+            @if (inventario == null)
+            {
+                <p>Cargando inventario...</p>
+            }
+            else
+            {
+                var inventarioFiltrado = string.IsNullOrWhiteSpace(filtro)
+                ? inventario
+                : inventario.Where(i => i.ingrediente.nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)).ToList();
 
-@if (inventario == null)
-{
-    <p>Cargando inventario...</p>
-}
-else
-{
-    var inventarioFiltrado = string.IsNullOrWhiteSpace(filtro)
-        ? inventario
-        : inventario.Where(i => i.ingrediente.nombre.Contains(filtro, StringComparison.OrdinalIgnoreCase)).ToList();
-
-    if (!inventarioFiltrado.Any())
-    {
-        <p>No hay stock disponible.</p>
-    }
-    else
-    {
-        <div class="container">
-            <div class="row">
-                @foreach (var item in inventarioFiltrado)
+                if (!inventarioFiltrado.Any())
                 {
-                    <div class="col-md-3 mb-4">
-                        <div class="card text-white bg-secondary">
-                            <div class="card-header">Lote: @item.lote</div>
-                            <div class="card-body">
-                                <h5 class="card-title">@item.ingrediente.nombre</h5>
-                                <p class="card-text"><strong>Cantidad:</strong> @item.stock</p>
-                                <p class="card-text"><small><strong>Vence:</strong> @item.fecha_vencimiento</small></p>
-                            </div>
+                    <p>No hay stock disponible.</p>
+                }
+                else
+                {
+                    <div class="container">
+                        <div class="row">
+                            @foreach (var item in inventarioFiltrado)
+                            {
+                                <div class="col-md-auto mb-4">
+                                    @* <div class="card text-white bg-secondary"> *@
+                                    <div class="card text-black bg-light">
+                                        <div class="card-header">Lote: @item.lote</div>
+                                        <div class="card-body">
+                                            <h5 class="card-title">@item.ingrediente.nombre</h5>
+                                            <p class="card-text"><strong>Cantidad:</strong> @item.stock</p>
+                                            <p class="card-text"><small><strong>Vence:</strong> @item.fecha_vencimiento</small></p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
-            </div>
+            }
         </div>
-    }
-}
+    </div>
+</div>
 
 @code {
     private List<Inventario> inventario;
