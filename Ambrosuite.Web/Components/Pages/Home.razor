@@ -5,11 +5,22 @@
 @inject NavigationManager Navigation
 @rendermode InteractiveServer
 
-<PageTitle>Home</PageTitle>
 
-<h1>Hola! </h1>
 
-Bienvenido a Ambrosuite
+<div class="home-background">
+    <div class="overlay text-center text-white d-flex flex-column justify-content-center align-items-center">
+        <h1 class="display-4 fw-bold">¡Hola!</h1>
+        <p class="lead">Bienvenido a <strong>Ambrosuite</strong></p>
+
+        <div class="card bg-dark bg-opacity-75 border-0 rounded-4 mt-4 p-4 shadow">
+            <h5 class="card-title fw-bold">¿Qué querés hacer hoy?</h5>
+            <p class="card-text text-light">Utilizá el menú lateral para gestionar pedidos, inventario y más funciones.</p>
+            <a href="/ambrosuite" class="btn btn-outline-light rounded-pill px-4 mt-2">
+                Ver mapa de mesas
+            </a>
+        </div>
+    </div>
+</div>
 
 @code {
     private bool isAuthenticated = false;
@@ -46,3 +57,24 @@ Bienvenido a Ambrosuite
         }
     }
 }
+
+
+<style>
+
+    .home-background {
+        background-image: url('icono/background-img.png');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        min-height: 100vh;
+        position: relative;
+    }
+
+    .overlay {
+        background-color: rgba(0, 0, 0, 0.6); /* oscurece para contraste */
+        min-height: 100vh;
+        width: 100%;
+        padding: 2rem;
+    }
+
+</style>
