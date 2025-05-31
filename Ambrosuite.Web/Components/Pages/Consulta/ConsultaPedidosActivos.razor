@@ -6,102 +6,109 @@
 @inject RecetaService RecetaService
 @rendermode InteractiveServer
 
-<h3 class="mb-4">Pedidos Activos</h3>
-
-@if (pedidosActivos == null)
-{
-    <p>Cargando pedidos...</p>
-}
-else
-{
-    if (!pedidosActivos.Any())
-    {
-        <p>No hay pedidos activos.</p>
-    }
-    else
-    {
-        <p>Seleccione un pedido, si desea ver el detalle con sus respectivas recetas.</p>
-        <div class="container">
-            <div class="row">
-                @foreach (var pedido in pedidosActivos)
+<div class="home-background">
+    <div class="overlay text-center text-white d-flex flex-column justify-content-center align-items-center">
+        <div class="card bg-dark bg-opacity-75 border-0 rounded-4 mt-4 p-4 shadow">
+            <h5 class="card-title fw-bold">Pedidos Activos</h5>
+        </div>
+        <div class="m-5">
+            @if (pedidosActivos == null)
+            {
+                <p>Cargando pedidos...</p>
+            }
+            else
+            {
+                if (!pedidosActivos.Any())
                 {
-                    <div class="col-md-3 mb-4">
-                        <div class="card text-white bg-primary" @onclick="() => MostrarModal(pedido)">
-                            <div class="card-header">Pedido #: @pedido.id</div>
-                            <div class="card-body">
-                                <p class="card-text"><strong>Total:</strong> @pedido.total</p>
-                            </div>
+                    <p>No hay pedidos activos.</p>
+                }
+                else
+                {
+                    <p>Seleccione un pedido, si desea ver el detalle con sus respectivas recetas.</p>
+                    <div class="container">
+                        <div class="row">
+                            @foreach (var pedido in pedidosActivos)
+                            {
+                                <div class="col-md-auto mb-4">
+                                    <div class="card text-white bg-primary" @onclick="() => MostrarModal(pedido)">
+                                        <div class="card-header">Pedido #: @pedido.id</div>
+                                        <div class="card-body">
+                                            <p class="card-text"><strong>Total:</strong> @pedido.total</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
                         </div>
                     </div>
                 }
-            </div>
-        </div>
-    }
-}
+            }
 
-<!-- Modal -->
-@if (pedidoSeleccionado != null)
-{
-    <div class="modal show d-block" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detalles del Pedido #: @pedidoSeleccionado.id</h5>
-                    <button type="button" class="btn-close" @onclick="CerrarModal"></button>
-                </div>
-                <div class="modal-body">
-                    @if (productosPedido == null)
-                    {
-                        <p>Cargando detalles del pedido...</p>
-                    }
-                    else
-                    {
-                        <div class="container">
-                            <div class="row">
-                                @foreach (var item in productosPedido)
+            <!-- Modal -->
+            @if (pedidoSeleccionado != null)
+            {
+                <div class="modal show d-block" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content text-black">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detalles del Pedido #: @pedidoSeleccionado.id</h5>
+                                <button type="button" class="btn-close" @onclick="CerrarModal"></button>
+                            </div>
+                            <div class="modal-body">
+                                @if (productosPedido == null)
                                 {
-                                    <div class="col-md-6 mb-4">
-                                        <div class="card">
-                                            <div class="card-header">
-                                                <h5>@item.producto.nombre</h5>
-                                            </div>
-                                            <div class="card-body">
-                                                @if (item.producto.recetas == null)
-                                                {
-                                                    <p>Cargando recetas...</p>
-                                                }
-                                                else if (item.producto.recetas.Any())
-                                                {
-                                                    <ul class="list-group list-group-flush">
-                                                        @foreach (var receta in item.producto.recetas)
-                                                        {
-                                                            <li class="list-group-item">
-                                                                <strong>Ingrediente:</strong> @receta.ingrediente.nombre<br />
-                                                                <strong>Descripción:</strong> @receta.descripcion<br />
-                                                                <strong>Cantidad:</strong> @receta.cantidad
-                                                            </li>
-                                                        }
-                                                    </ul>
-                                                }
-                                                else
-                                                {
-                                                    <p>Receta no disponible</p>
-                                                }
-                                            </div>
+                                    <p>Cargando detalles del pedido...</p>
+                                }
+                                else
+                                {
+                                    <div class="container">
+                                        <div class="row">
+                                            @foreach (var item in productosPedido)
+                                            {
+                                                <div class="col-md-auto mb-4">
+                                                    <div class="card">
+                                                        <div class="card-header">
+                                                            <h5>@item.producto.nombre</h5>
+                                                        </div>
+                                                        <div class="card-body">
+                                                            @if (item.producto.recetas == null)
+                                                            {
+                                                                <p>Cargando recetas...</p>
+                                                            }
+                                                            else if (item.producto.recetas.Any())
+                                                            {
+                                                                <ul class="list-group list-group-flush">
+                                                                    @foreach (var receta in item.producto.recetas)
+                                                                    {
+                                                                        <li class="list-group-item">
+                                                                            <strong>Ingrediente:</strong> @receta.ingrediente.nombre<br />
+                                                                            <strong>Descripción:</strong> @receta.descripcion<br />
+                                                                            <strong>Cantidad:</strong> @receta.cantidad
+                                                                        </li>
+                                                                    }
+                                                                </ul>
+                                                            }
+                                                            else
+                                                            {
+                                                                <p>Receta no disponible</p>
+                                                            }
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
                                         </div>
                                     </div>
                                 }
                             </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
+                            </div>
                         </div>
-                    }
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" @onclick="CerrarModal">Cerrar</button>
-                </div>
-            </div>
+            }
         </div>
     </div>
-}
+</div>
 
 @code {
     private List<Pedido> pedidosActivos;
