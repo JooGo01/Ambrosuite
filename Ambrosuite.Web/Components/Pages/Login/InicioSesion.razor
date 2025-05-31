@@ -6,24 +6,32 @@
 @using Ambrosuite.Web.ServicesWeb;
 @inject AuthService AuthService
 
-<h3>Iniciar Sesión</h3>
+<div class="home-background">
+    <div class="overlay text-center text-white d-flex flex-column justify-content-center align-items-center">
+        <div class="card bg-dark bg-opacity-75 border-0 rounded-4 mt-4 p-4 shadow">
+            <h5 class="card-title fw-bold">Iniciar Sesión</h5>
+            <!-- Textbox para filtrar -->
+            <div class="mb-3">
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="m-3 alert alert-danger">@ErrorMessage</div>
+                }
 
-@if (!string.IsNullOrEmpty(ErrorMessage))
-{
-    <div class="alert alert-danger">@ErrorMessage</div>
-}
+                <div class="m-4">
+                    <label>Email</label>
+                    <input @bind="email" class="form-control" />
+                </div>
 
-<div>
-    <label>Email</label>
-    <input @bind="email" class="form-control" />
+                <div class="m-4">
+                    <label>Contraseña</label>
+                    <input type="password" @bind="password" class="form-control" />
+                </div>
+
+                <button @onclick="Login" class="m-4 btn btn-primary">Ingresar</button>
+            </div>
+        </div>
+    </div>
 </div>
-
-<div>
-    <label>Contraseña</label>
-    <input type="password" @bind="password" class="form-control" />
-</div>
-
-<button @onclick="Login" class="btn btn-primary">Ingresar</button>
 
 @code {
     private string email { get; set; } = "";
