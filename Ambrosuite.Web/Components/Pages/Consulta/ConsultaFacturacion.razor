@@ -5,84 +5,92 @@
 @inject FacturacionesService FacturacionesService
 @rendermode InteractiveServer
 
-<h3 class="mb-4">Consulta de Facturación</h3>
+@* <div class="home-background"> *@
+    <div class="overlay text-center text-white d-flex flex-column justify-content-center align-items-center">
+        <div class="card bg-dark bg-opacity-75 border-0 rounded-4 mt-4 p-4 shadow">
+            <h5 class="card-title fw-bold">Consulta de Facturación</h5>
+            <!-- Filtros -->
+            <div class="mb-3 text-light">
+                <InputRadioGroup TValue="string" @bind-Value="filtroSeleccionado">
+                    <div class="form-check">
+                    <InputRadio TValue="string" class="form-check-input" id="filtroDia" Value="@("dia")" @onchange="ActualizarFiltroPorDefecto" />
+                        <label class="form-check-label" for="filtroDia">Día</label>
+                    </div>
+                    <div class="form-check">
+                    <InputRadio TValue="string" class="form-check-input" id="filtroMes" Value="@("mes")" @onchange="ActualizarFiltroPorDefecto" />
+                        <label class="form-check-label" for="filtroMes">Mes</label>
+                    </div>
+                    <div class="form-check">
+                    <InputRadio TValue="string" class="form-check-input" id="filtroAnio" Value="@("anio")" @onchange="ActualizarFiltroPorDefecto" />
+                        <label class="form-check-label" for="filtroAnio">Año</label>
+                    </div>
+                </InputRadioGroup>
 
-<!-- Filtros -->
-<div class="mb-3">
-    <InputRadioGroup TValue="string" @bind-Value="filtroSeleccionado">
-        <div class="form-check">
-            <InputRadio TValue="string" class="form-check-input" id="filtroDia" Value="@("dia")" />
-            <label class="form-check-label" for="filtroDia">Día</label>
+                <div class="m-3">
+                    @if (filtroSeleccionado == "dia")
+                    {
+                        <label for="filtroDiaInput">Día:</label>
+                        <input type="date" @bind="filtroDia" class="form-control" id="filtroDiaInput" />
+                    }
+                    else if (filtroSeleccionado == "mes")
+                    {
+                        <label for="filtroMesInput">Mes:</label>
+                        <input type="month" @bind="filtroMes" class="form-control" id="filtroMesInput" />
+                    }
+                    else if (filtroSeleccionado == "anio")
+                    {
+                        <label for="filtroAnioInput">Año:</label>
+                        <input type="number" @bind="filtroAnio" class="form-control" id="filtroAnioInput" min="2000" max="2100" />
+                    }
+                </div>
+            </div>
+
+            <button class="btn btn-primary" @onclick="Consultar">Consultar</button>
         </div>
-        <div class="form-check">
-            <InputRadio TValue="string" class="form-check-input" id="filtroMes" Value="@("mes")" />
-            <label class="form-check-label" for="filtroMes">Mes</label>
+        <div class="m-5">
+        @if (facturas == null)
+        {
+            <p>Realice una consulta para ver las facturas.</p>
+        }
+        else if (!facturas.Any())
+        {
+            <p>No se encontraron facturas para los filtros seleccionados.</p>
+        }
+        else
+        {
+            <div class="table-responsive text-light">
+                <table class="table table-striped table-light">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Número de Factura</th>
+                            <th>Total</th>
+                            <th>Fecha de Emisión</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var factura in facturas)
+                        {
+                            <tr>
+                                <td>@factura.id</td>
+                                <td>@factura.numero_factura</td>
+                                <td>@factura.total</td>
+                                <td>@factura.fecha_emision</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4">
+                <h4>Resumen</h4>
+                <p><strong>Total Facturado:</strong> @facturas.Sum(f => f.total)</p>
+                <p><strong>Cantidad de Facturas:</strong> @facturas.Count</p>
+            </div>
+        }
         </div>
-        <div class="form-check">
-            <InputRadio TValue="string" class="form-check-input" id="filtroAnio" Value="@("anio")" />
-            <label class="form-check-label" for="filtroAnio">Año</label>
-        </div>
-    </InputRadioGroup>
-
-    @if (filtroSeleccionado == "dia")
-    {
-        <label for="filtroDiaInput">Día:</label>
-        <input type="date" @bind="filtroDia" class="form-control" id="filtroDiaInput" />
-    }
-    else if (filtroSeleccionado == "mes")
-    {
-        <label for="filtroMesInput">Mes:</label>
-        <input type="month" @bind="filtroMes" class="form-control" id="filtroMesInput" />
-    }
-    else if (filtroSeleccionado == "anio")
-    {
-        <label for="filtroAnioInput">Año:</label>
-        <input type="number" @bind="filtroAnio" class="form-control" id="filtroAnioInput" min="2000" max="2100" />
-    }
-</div>
-
-<button class="btn btn-primary" @onclick="Consultar">Consultar</button>
-
-@if (facturas == null)
-{
-    <p>Realice una consulta para ver las facturas.</p>
-}
-else if (!facturas.Any())
-{
-    <p>No se encontraron facturas para los filtros seleccionados.</p>
-}
-else
-{
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Número de Factura</th>
-                    <th>Total</th>
-                    <th>Fecha de Emisión</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var factura in facturas)
-                {
-                    <tr>
-                        <td>@factura.id</td>
-                        <td>@factura.numero_factura</td>
-                        <td>@factura.total</td>
-                        <td>@factura.fecha_emision</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
     </div>
-
-    <div class="mt-4">
-        <h4>Resumen</h4>
-        <p><strong>Total Facturado:</strong> @facturas.Sum(f => f.total)</p>
-        <p><strong>Cantidad de Facturas:</strong> @facturas.Count</p>
-    </div>
-}
+@* </div> *@
 
 @code {
     private List<Facturacion> facturas;
@@ -90,6 +98,31 @@ else
     private DateTime? filtroDia;
     private DateTime? filtroMes;
     private int? filtroAnio;
+
+    protected override void OnInitialized()
+    {
+        filtroDia = DateTime.Today;
+        filtroMes = new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+        filtroAnio = DateTime.Today.Year;
+    }
+
+    private void ActualizarFiltroPorDefecto(ChangeEventArgs e)
+    {
+        var nuevoValor = e.Value?.ToString();
+        switch (nuevoValor)
+        {
+            case "dia":
+                filtroDia ??= DateTime.Today;
+                break;
+            case "mes":
+                filtroMes ??= new DateTime(DateTime.Today.Year, DateTime.Today.Month, 1);
+                break;
+            case "anio":
+                filtroAnio ??= DateTime.Today.Year;
+                break;
+        }
+    }
+
 
     private async Task Consultar()
     {
