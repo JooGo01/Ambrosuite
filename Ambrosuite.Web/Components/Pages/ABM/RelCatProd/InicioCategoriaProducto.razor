@@ -88,6 +88,16 @@
         await LoadCategoria();
         await LoadProducto();
 		await LoadCategoriaProductos();
+
+        if (listaCategoria.Any())
+        {
+            categoria.categoria_id = listaCategoria.First().id;
+        }
+
+        if (productos.Any())
+        {
+            categoria.producto_id = productos.First().id;
+        }
     }
 
     private async Task LoadCategoria()

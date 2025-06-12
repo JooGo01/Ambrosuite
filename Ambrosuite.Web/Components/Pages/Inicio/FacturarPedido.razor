@@ -111,6 +111,16 @@ else
             pedidoDetalles = await pedidoDetalleService.GetDetallePedidoByIdAsync(pedidoId);
             metodosPago = await metodoPagoService.GetMetodoPagoAsync();
             tiposFactura = await tipoFacturaService.GetTipoFacturaAsync();
+
+            if(tiposFactura.Any())
+            {
+                facturacion.tipo_factura_id = tiposFactura.First().id;
+            }
+
+            if(metodosPago.Any())
+            {
+                facturacion.metodo_pago_id = metodosPago.First().id;
+            }
         }
         catch (Exception ex)
         {

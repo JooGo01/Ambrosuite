@@ -106,6 +106,16 @@
         await LoadProducto();
         await LoadIngredientes();
         await LoadReceta();
+
+        if (listaProducto.Any())
+        {
+            receta.producto_final_id = listaProducto.First().id;
+        }
+
+        if (listaIngrediente.Any())
+        {
+            receta.ingrediente_id = listaIngrediente.First().id;
+        }
     }
 
     private async Task LoadReceta()

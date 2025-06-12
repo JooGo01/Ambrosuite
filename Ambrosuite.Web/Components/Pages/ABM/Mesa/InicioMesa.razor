@@ -72,6 +72,11 @@
     {
         await LoadMesa();
         await LoadEstadoMesas();
+
+        if (listEstado.Any())
+        {
+            mesa.estado = listEstado.First().num_estado;
+        }
     }
 
 	private async Task LoadEstadoMesas()

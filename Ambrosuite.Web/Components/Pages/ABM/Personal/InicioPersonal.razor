@@ -104,6 +104,11 @@
     {
         await LoadUsuarios();
         await LoadRoles();
+
+        if (roles.Any())
+        {
+            personal.rol_id = roles.First().id; // Asignar el primer rol por defecto
+        }
     }
 
     private async Task LoadUsuarios()

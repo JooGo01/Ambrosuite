@@ -95,6 +95,11 @@
     {
         await LoadInventario();
         await LoadIngrediente();
+
+        if (ingredientes.Any())
+        {
+            inventario.ingrediente_id = ingredientes.First().id;
+        }
     }
 
     private async Task LoadInventario()
