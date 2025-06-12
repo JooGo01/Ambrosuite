@@ -15,15 +15,29 @@
         <div class="card bg-dark bg-opacity-75 border-0 rounded-4 mt-4 p-4 shadow">
             <h5 class="card-title fw-bold">¿Qué querés hacer hoy?</h5>
             <p class="card-text text-light">Utilizá el menú lateral para gestionar pedidos, inventario y más funciones.</p>
-            <a href="/ambrosuite" class="btn btn-outline-light rounded-pill px-4 mt-2">
-                Ver mapa de mesas
-            </a>
+            @if (UserRole.Equals("Administracion") || UserRole.Equals("Mozo"))
+            {
+                <a href="/ambrosuite" class="btn btn-outline-light rounded-pill px-4 mt-2">
+                    Ver Mapa de Mesas
+                </a>
+            }
+            else
+            {
+                <a href ="/pedidos-activos" class="btn btn-outline-light rounded-pill px-4 mt-2">
+                    Ver Pedidos Activos
+                </a>
+            }
         </div>
     </div>
 </div>
 
 @code {
     private bool isAuthenticated = false;
+
+    [Inject]
+    private AuthService authService { get; set; }
+
+    private string UserRole { get; set; } = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,6 +66,8 @@
     {
         if (firstRender)
         {
+            UserRole = await authService.GetRoleAsync();
+            StateHasChanged(); // Forzar actualización del UI después de obtener el rol
             isBrowser = true;
             await CheckAuthentication();
         }
