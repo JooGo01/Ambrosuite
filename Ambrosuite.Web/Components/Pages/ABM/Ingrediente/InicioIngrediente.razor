@@ -5,64 +5,67 @@
 @inject IngredientesService IngredienteService
 @rendermode InteractiveServer
 
-<h3>Gestión de Ingredientes</h3>
+<div class="layout-container">
+    <div class="main-content text-black">
+        <h3>Gestión de Ingredientes</h3>
 
-<button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Ingrediente</button>
+        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Ingrediente</button>
 
-@if (mostrarFormulario)
-{
-    <EditForm Model="ingrediente" OnValidSubmit="GuardarIngrediente">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <InputText id="nombre" class="form-control" @bind-Value="ingrediente.nombre" />
-        </div>
-        <div class="form-group">
-            <label for="descripcion">Descripcion</label>
-            <InputText id="descripcion" class="form-control" @bind-Value="ingrediente.descripcion" />
-        </div>
-        <div class="form-group">
-            <label for="marca">Marca</label>
-            <InputText id="marca" class="form-control" @bind-Value="ingrediente.marca" />
-        </div>
-        <div class="form-group">
-            <label for="alertaCantidad">Alerta Cantidad</label>
-            <InputNumber id="alertaCantidad" class="form-control" @bind-Value="ingrediente.alertaCantidad" />
-        </div>
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-    </EditForm>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Descripcion</th>
-            <th>Marca</th>
-            <th>Alerta Cantidad</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var ing in listaIngrediente)
+        @if (mostrarFormulario)
         {
-            <tr>
-                <td>@ing.nombre</td>
-                <td>@ing.descripcion</td>
-                <td>@ing.marca</td>
-                <td>@ing.alertaCantidad</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(ing)">Modificar</button>
-                    <button class="btn btn-danger" @onclick="() => EliminarIngrediente(ing)">Eliminar</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <EditForm Model="ingrediente" OnValidSubmit="GuardarIngrediente">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <InputText id="nombre" class="form-control" @bind-Value="ingrediente.nombre" />
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripcion</label>
+                    <InputText id="descripcion" class="form-control" @bind-Value="ingrediente.descripcion" />
+                </div>
+                <div class="form-group">
+                    <label for="marca">Marca</label>
+                    <InputText id="marca" class="form-control" @bind-Value="ingrediente.marca" />
+                </div>
+                <div class="form-group">
+                    <label for="alertaCantidad">Alerta Cantidad</label>
+                    <InputNumber id="alertaCantidad" class="form-control" @bind-Value="ingrediente.alertaCantidad" />
+                </div>
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </EditForm>
+        }
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Marca</th>
+                    <th>Alerta Cantidad</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ing in listaIngrediente)
+                {
+                    <tr>
+                        <td>@ing.nombre</td>
+                        <td>@ing.descripcion</td>
+                        <td>@ing.marca</td>
+                        <td>@ing.alertaCantidad</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(ing)">Modificar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarIngrediente(ing)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @code {
     private List<Ingrediente> listaIngrediente = new();
     private bool isLoading = true;

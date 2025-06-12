@@ -5,58 +5,61 @@
 @inject ProductosService productoService
 @rendermode InteractiveServer
 
-<h3>Gestión de Productos</h3>
+<div class="layout-container">
+    <div class="main-content text-black">
+        <h3>Gestión de Productos</h3>
 
-<button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Producto</button>
+        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Producto</button>
 
-@if (mostrarFormulario)
-{
-    <EditForm Model="producto" OnValidSubmit="GuardarProducto">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <InputText id="nombre" class="form-control" @bind-Value="producto.nombre" />
-        </div>
-        <div class="form-group">
-            <label for="descripcion">Descripcion</label>
-            <InputText id="descripcion" class="form-control" @bind-Value="producto.descripcion" />
-        </div>
-        <div class="form-group">
-            <label for="precio">Precio</label>
-            <InputNumber id="precio" class="form-control" @bind-Value="producto.precio" />
-        </div>
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-    </EditForm>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Descripcion</th>
-            <th>Precio</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var prod in listaProductos)
+        @if (mostrarFormulario)
         {
-            <tr>
-                <td>@prod.nombre</td>
-                <td>@prod.descripcion</td>
-                <td>@prod.precio</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(prod)">Modificar</button>
-                    <button class="btn btn-danger" @onclick="() => EliminarProducto(prod)">Eliminar</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <EditForm Model="producto" OnValidSubmit="GuardarProducto">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <InputText id="nombre" class="form-control" @bind-Value="producto.nombre" />
+                </div>
+                <div class="form-group">
+                    <label for="descripcion">Descripcion</label>
+                    <InputText id="descripcion" class="form-control" @bind-Value="producto.descripcion" />
+                </div>
+                <div class="form-group">
+                    <label for="precio">Precio</label>
+                    <InputNumber id="precio" class="form-control" @bind-Value="producto.precio" />
+                </div>
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </EditForm>
+        }
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Precio</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var prod in listaProductos)
+                {
+                    <tr>
+                        <td>@prod.nombre</td>
+                        <td>@prod.descripcion</td>
+                        <td>@prod.precio</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(prod)">Modificar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarProducto(prod)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @code {
     private List<ProductoFinal> listaProductos = new();
     private bool isLoading = true;

@@ -7,80 +7,83 @@
 @inject ProductosService productoService
 @rendermode InteractiveServer
 
-<h3>Gestión de Receta</h3>
+<div class="layout-container">
+    <div class="main-content text-black">
+        <h3>Gestión de Receta</h3>
 
-<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Receta</button>
+        <button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Receta</button>
 
-@if (mostrarFormulario)
-{
-    <EditForm Model="receta" OnValidSubmit="GuardarReceta">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="producto_final_id">Producto</label>
-            <InputSelect id="producto_final_id" class="form-control" @bind-Value="receta.producto_final_id">
-                @foreach (var productoFinal in listaProducto)
-                {
-                    <option value="@productoFinal.id">@productoFinal.nombre</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="form-group">
-            <label for="ingrediente_id">Ingrediente</label>
-            <InputSelect id="ingrediente_id" class="form-control" @bind-Value="receta.ingrediente_id">
-                @foreach (var ing in listaIngrediente)
-                {
-                    <option value="@ing.id">@ing.nombre</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="form-group">
-            <label for="cantidad">Cantidad</label>
-            <InputNumber id="cantidad" class="form-control" @bind-Value="receta.cantidad"/>
-        </div>
-
-        <div class="form-group">
-            <label for="descripcion">Descripcion</label>
-            <InputText id="descripcion" class="form-control" @bind-Value="receta.descripcion" />
-        </div>
-
-        <div class="form-group">
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-        </div>
-    </EditForm>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Ingrediente</th>
-            <th>Cantidad</th>
-            <th>Descripcion</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var rec in listaReceta)
+        @if (mostrarFormulario)
         {
-            <tr>
-                <td>@rec.producto_final.nombre</td>
-                <td>@rec.ingrediente.nombre</td>
-                <td>@rec.cantidad</td>
-                <td>@rec.descripcion</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(rec)">Modificar</button>
-                    <button class="btn btn-danger" @onclick="() => EliminarReceta(rec)">Eliminar</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <EditForm Model="receta" OnValidSubmit="GuardarReceta">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
+                <div class="form-group">
+                    <label for="producto_final_id">Producto</label>
+                    <InputSelect id="producto_final_id" class="form-control" @bind-Value="receta.producto_final_id">
+                        @foreach (var productoFinal in listaProducto)
+                        {
+                            <option value="@productoFinal.id">@productoFinal.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label for="ingrediente_id">Ingrediente</label>
+                    <InputSelect id="ingrediente_id" class="form-control" @bind-Value="receta.ingrediente_id">
+                        @foreach (var ing in listaIngrediente)
+                        {
+                            <option value="@ing.id">@ing.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label for="cantidad">Cantidad</label>
+                    <InputNumber id="cantidad" class="form-control" @bind-Value="receta.cantidad"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripcion</label>
+                    <InputText id="descripcion" class="form-control" @bind-Value="receta.descripcion" />
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+            </EditForm>
+        }
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Ingrediente</th>
+                    <th>Cantidad</th>
+                    <th>Descripcion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var rec in listaReceta)
+                {
+                    <tr>
+                        <td>@rec.producto_final.nombre</td>
+                        <td>@rec.ingrediente.nombre</td>
+                        <td>@rec.cantidad</td>
+                        <td>@rec.descripcion</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(rec)">Modificar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarReceta(rec)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @code {
     private List<Receta> listaReceta = new();
     private List<Ingrediente> listaIngrediente = new();

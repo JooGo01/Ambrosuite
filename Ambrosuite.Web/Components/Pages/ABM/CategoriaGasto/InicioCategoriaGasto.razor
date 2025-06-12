@@ -5,52 +5,53 @@
 @inject CategoriaGastosService CategoriaGService
 @rendermode InteractiveServer
 
-<h3>Gestión de Categoria Gasto</h3>
-
-<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Gasto</button>
-
-@if (mostrarFormulario)
-{
-    <EditForm Model="categoriaGasto" OnValidSubmit="GuardarCategoriaGasto">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="nombre">Nombre Gasto</label>
-            <InputText id="nombre" class="form-control" @bind-Value="categoriaGasto.gasto_nombre" />
-        </div>
-        <div class="form-group">
-            <label for="descripcion_rol">Descripcion Gasto</label>
-            <InputText id="descripcion_rol" class="form-control" @bind-Value="categoriaGasto.gasto_descripcion" />
-        </div>
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-    </EditForm>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Descripcion</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var categoriaGasto in listaCategoriaGasto)
+<div class="layout-container">
+    <div class="main-content text-black">
+        <h3>Gestión de Categoria Gasto</h3>
+        <button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Gasto</button>
+        @if (mostrarFormulario)
         {
-            <tr>
-                <td>@categoriaGasto.gasto_nombre</td>
-                <td>@categoriaGasto.gasto_descripcion</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoriaGasto)">Modificar</button>
-                    @* <button class="btn btn-danger" @onclick="() => EliminarRol(role)">Eliminar</button> *@
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <EditForm Model="categoriaGasto" OnValidSubmit="GuardarCategoriaGasto">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
+                <div class="form-group">
+                    <label for="nombre">Nombre Gasto</label>
+                    <InputText id="nombre" class="form-control" @bind-Value="categoriaGasto.gasto_nombre" />
+                </div>
+                <div class="form-group">
+                    <label for="descripcion_rol">Descripcion Gasto</label>
+                    <InputText id="descripcion_rol" class="form-control" @bind-Value="categoriaGasto.gasto_descripcion" />
+                </div>
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </EditForm>
+        }
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Descripcion</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var categoriaGasto in listaCategoriaGasto)
+                {
+                    <tr>
+                        <td>@categoriaGasto.gasto_nombre</td>
+                        <td>@categoriaGasto.gasto_descripcion</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoriaGasto)">Modificar</button>
+                            @* <button class="btn btn-danger" @onclick="() => EliminarRol(role)">Eliminar</button> *@
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @code {
     private List<CategoriaGasto> listaCategoriaGasto = new();
     private bool isLoading = true;

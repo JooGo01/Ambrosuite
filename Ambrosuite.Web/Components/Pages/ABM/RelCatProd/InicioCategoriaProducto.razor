@@ -7,65 +7,68 @@
 @inject ProductosService productoService
 @rendermode InteractiveServer
 
-<h3>Gestión de Categoria Producto</h3>
+<div class="layout-container">
+    <div class="main-content text-black">
+        <h3>Gestión de Categoria Producto</h3>
 
-<button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Producto</button>
+        <button class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Categoria Producto</button>
 
-@if (mostrarFormulario)
-{
-    <EditForm Model="categoria" OnValidSubmit="GuardarCategoriaProducto">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="producto_id">Producto</label>
-            <InputSelect id="producto_id" class="form-control" @bind-Value="categoria.producto_id">
-                @foreach (var productoFinal in productos)
-                {
-                    <option value="@productoFinal.id">@productoFinal.nombre</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="form-group">
-            <label for="categoria_id">Categoria</label>
-            <InputSelect id="categoria_id" class="form-control" @bind-Value="categoria.categoria_id">
-                @foreach (var cate in listaCategoria)
-                {
-                    <option value="@cate.id">@cate.nombre</option>
-                }
-            </InputSelect>
-        </div>
-
-        <div class="form-group">
-            <button type="submit" class="btn btn-success">Guardar</button>
-            <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-        </div>
-    </EditForm>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Producto</th>
-            <th>Categoria</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var categoria in categoriaProductos)
+        @if (mostrarFormulario)
         {
-            <tr>
-                <td>@categoria.producto.nombre</td>
-                <td>@categoria.categoria.nombre</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoria)">Modificar</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <EditForm Model="categoria" OnValidSubmit="GuardarCategoriaProducto">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
+                <div class="form-group">
+                    <label for="producto_id">Producto</label>
+                    <InputSelect id="producto_id" class="form-control" @bind-Value="categoria.producto_id">
+                        @foreach (var productoFinal in productos)
+                        {
+                            <option value="@productoFinal.id">@productoFinal.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <label for="categoria_id">Categoria</label>
+                    <InputSelect id="categoria_id" class="form-control" @bind-Value="categoria.categoria_id">
+                        @foreach (var cate in listaCategoria)
+                        {
+                            <option value="@cate.id">@cate.nombre</option>
+                        }
+                    </InputSelect>
+                </div>
+
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                    <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                </div>
+            </EditForm>
+        }
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>Categoria</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var categoria in categoriaProductos)
+                {
+                    <tr>
+                        <td>@categoria.producto.nombre</td>
+                        <td>@categoria.categoria.nombre</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(categoria)">Modificar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @code {
     private List<CategoriaProducto> categoriaProductos = new();
     private List<ProductoFinal> productos = new();

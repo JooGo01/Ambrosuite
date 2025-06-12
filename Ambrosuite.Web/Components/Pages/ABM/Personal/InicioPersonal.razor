@@ -6,77 +6,80 @@
 @inject RolesService RolService
 @rendermode InteractiveServer
 
-<h3>Gestión de Personal</h3>
+<div class="layout-container">
+    <div class="main-content text-black">
+        <h3>Gestión de Personal</h3>
 
-<button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Personal</button>
+        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Personal</button>
 
-@if (mostrarFormulario)
-{
-    <EditForm Model="personal" OnValidSubmit="GuardarPersonal">
-        <DataAnnotationsValidator />
-        <ValidationSummary />
-
-        <div class="form-group">
-            <label for="nombre">Nombre</label>
-            <InputText id="nombre" class="form-control" @bind-Value="personal.nombre" />
-        </div>
-        <div class="form-group">
-            <label for="apellido">Apellido</label>
-            <InputText id="apellido" class="form-control" @bind-Value="personal.apellido" />
-        </div>
-        <div class="form-group">
-            <label for="fecha_nacimiento">Fecha de Nacimiento</label>
-            <InputDate id="fecha_nacimiento" class="form-control" @bind-Value="personal.fecha_nacimiento" />
-        </div>
-        <div class="form-group">
-            <label for="email">Email</label>
-            <InputText id="email" class="form-control" @bind-Value="personal.email" />
-        </div>
-        <div class="form-group">
-            <label for="cuil">CUIL</label>
-            <InputText id="cuil" class="form-control" @bind-Value="personal.cuil" />
-        </div>
-        <div class="form-group">
-            <label for="contrasenia">Contraseña</label>
-            <InputText id="contrasenia" type="password" class="form-control" @bind-Value="personal.contrasenia" />
-        </div>
-        <div class="form-group">
-            <label for="rol_id">Rol</label>
-            <InputSelect id="rol_id" class="form-control" @bind-Value="personal.rol_id">
-                @foreach (var rol in roles)
-                {
-                    <option value="@rol.id">@rol.nombre_rol</option>
-                }
-            </InputSelect>
-        </div>
-        <button type="submit" class="btn btn-success">Guardar</button>
-        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-    </EditForm>
-}
-
-<table class="table">
-    <thead>
-        <tr>
-            <th>Nombre</th>
-            <th>Apellido</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var persona in listaUsuario)
+        @if (mostrarFormulario)
         {
-            <tr>
-                <td>@persona.nombre</td>
-                <td>@persona.apellido</td>
-                <td>
-                    <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(persona)">Modificar</button>
-                    <button class="btn btn-danger" @onclick="() => EliminarPersonal(persona)">Eliminar</button>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+            <EditForm Model="personal" OnValidSubmit="GuardarPersonal">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
 
+                <div class="form-group">
+                    <label for="nombre">Nombre</label>
+                    <InputText id="nombre" class="form-control" @bind-Value="personal.nombre" />
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <InputText id="apellido" class="form-control" @bind-Value="personal.apellido" />
+                </div>
+                <div class="form-group">
+                    <label for="fecha_nacimiento">Fecha de Nacimiento</label>
+                    <InputDate id="fecha_nacimiento" class="form-control" @bind-Value="personal.fecha_nacimiento" />
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <InputText id="email" class="form-control" @bind-Value="personal.email" />
+                </div>
+                <div class="form-group">
+                    <label for="cuil">CUIL</label>
+                    <InputText id="cuil" class="form-control" @bind-Value="personal.cuil" />
+                </div>
+                <div class="form-group">
+                    <label for="contrasenia">Contraseña</label>
+                    <InputText id="contrasenia" type="password" class="form-control" @bind-Value="personal.contrasenia" />
+                </div>
+                <div class="form-group">
+                    <label for="rol_id">Rol</label>
+                    <InputSelect id="rol_id" class="form-control" @bind-Value="personal.rol_id">
+                        @foreach (var rol in roles)
+                        {
+                            <option value="@rol.id">@rol.nombre_rol</option>
+                        }
+                    </InputSelect>
+                </div>
+                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+            </EditForm>
+        }
+
+        <table class="table table-dark">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Apellido</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var persona in listaUsuario)
+                {
+                    <tr>
+                        <td>@persona.nombre</td>
+                        <td>@persona.apellido</td>
+                        <td>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(persona)">Modificar</button>
+                            <button class="btn btn-danger" @onclick="() => EliminarPersonal(persona)">Eliminar</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
 @code {
     private List<Usuario> listaUsuario = new();
     private List<Rol> roles = new();
