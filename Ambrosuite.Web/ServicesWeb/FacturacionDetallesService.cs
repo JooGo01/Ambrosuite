@@ -29,6 +29,9 @@ namespace Ambrosuite.Web.ServicesWeb
                     throw new Exception("No se encontró la facturación asociada al pedido.");
                 }
 
+                //cambiar estado a "limpieza" de la mesa 
+
+
                 // Construir la lista de FacturacionDetalleCreateUpdateDTO
                 var facturacionDetalles = new List<FacturacionDetalleCreateUpdateDTO>();
 

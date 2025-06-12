@@ -46,13 +46,13 @@ else
                             }
                         </InputSelect>
                     </div>
-    
+
                     <div class="form-group mt-3">
                         <button type="submit" class="btn btn-primary">Facturar</button>
                         <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
                     </div>
                 </EditForm>
-    
+
                 <h4>Detalles del Pedido</h4>
                 <table class="table table-dark">
                     <thead>
@@ -123,9 +123,10 @@ else
         try
         {
             facturacion.fecha_emision = DateTime.Now;
-			facturacion.punto_venta = 1;
+            facturacion.punto_venta = 1;
 
             await facturacionService.agregarFacturacionAsync(facturacion, pedidoId);
+            await pedidosService.actualizarMesaPorPedidoId(pedidoId);
             await facturacionDetalleService.agregarFacturacionDetalleAsync(pedidoDetalles, pedidoId);
             NavigationManager.NavigateTo($"/pedido/{pedidoId}");
         }

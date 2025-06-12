@@ -1,7 +1,9 @@
-﻿using System.Net.Http;
+﻿using System.Diagnostics;
+using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Ambrosuite.ApiService.Entities;
+using Ambrosuite.ApiService.EntitiesDTO;
 
 namespace Ambrosuite.Web.ServicesWeb
 {
@@ -29,6 +31,25 @@ namespace Ambrosuite.Web.ServicesWeb
 
         public async Task<Pedido> GetPedidoByIdAsync(int pedidoId) {
             Pedido? pedido = await _httpClient.GetFromJsonAsync<Pedido>($"api/pedidos/{pedidoId}");
+            return pedido;
+        }
+
+        public async Task<Pedido> actualizarMesaPorPedidoId(int pedidoId) {
+            Pedido? pedido = await _httpClient.GetFromJsonAsync<Pedido>($"api/pedidos/{pedidoId}");
+            Mesa mesaLimpieza = pedido.mesa;
+            try
+            {
+                MesaCreateUpdateDTO mesaUpdate = new MesaCreateUpdateDTO
+                {
+                    estado = 3
+                };
+                var response = await _httpClient.PutAsJsonAsync("/api/Mesas/" + mesaLimpieza.id, mesaUpdate);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error updating table: {ex.Message}");
+                throw;
+            }
             return pedido;
         }
     }
