@@ -23,6 +23,12 @@ namespace Ambrosuite.Web.ServicesWeb
             return pedidos;
         }
 
+        public async Task<List<Pedido>> GetPedidosByMesaActivoAsync(int mesaId)
+        {
+            List<Pedido>? pedidos = await _httpClient.GetFromJsonAsync<List<Pedido>>($"api/pedidos/mesaact/{mesaId}");
+            return pedidos;
+        }
+
         public async Task<List<Pedido>> GetPedidosByActivosAsync()
         {
             List<Pedido>? pedidos = await _httpClient.GetFromJsonAsync<List<Pedido>>($"api/pedidos/activos");

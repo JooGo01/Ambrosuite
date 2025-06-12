@@ -63,7 +63,7 @@
         if (mesa != null)
         {
             Debug.WriteLine($"Buscando ultimo pedido: {mesa.id}");
-            var pedidos = await PedidoService.GetPedidosByMesaAsync(mesa.id);
+            var pedidos = await PedidoService.GetPedidosByMesaActivoAsync(mesa.id);
             pedidoEnCurso = pedidos.FirstOrDefault();
         }
     }

@@ -77,6 +77,18 @@ namespace Ambrosuite.ApiService.Controllers
             return Ok(pedidos);
         }
 
+        [HttpGet("mesaact/{mesaId}")]
+        public async Task<ActionResult<List<Pedido>>> GetPedidosActByMesa(int mesaId)
+        {
+            var pedidos = await _context.Pedidos
+                .Include(p => p.mesa)
+                .Include(p => p.usuario)
+                .Where(p => p.mesa_id == mesaId && p.estado==0)
+                .ToListAsync();
+
+            return Ok(pedidos);
+        }
+
         [HttpPost]
         public async Task<ActionResult<Pedido>> AddPedido(PedidoCreateUpdateDTO pedidoDto)
         {
