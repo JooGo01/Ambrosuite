@@ -12,8 +12,6 @@
 
 <PageTitle>Facturar Pedido</PageTitle>
 
-<h3>Facturar Pedido</h3>
-
 @if (pedido == null)
 {
     <div class="loading-container">
@@ -23,56 +21,60 @@
 }
 else
 {
-    <div>
-        <EditForm Model="facturacion" OnValidSubmit="factPedido">
-            <DataAnnotationsValidator />
-            <ValidationSummary />
-
-            <div class="form-group">
-                <label for="tipo_factura_id">Tipo Factura</label>
-                <InputSelect id="tipo_factura_id" class="form-control" @bind-Value="facturacion.tipo_factura_id">
-                    @foreach (var tipoFactura in tiposFactura)
-                    {
-                        <option value="@tipoFactura.id">@tipoFactura.nombre_tipo - @tipoFactura.descripcion </option>
-                    }
-                </InputSelect>
+    <div class="layout-container">
+        <div class="main-content">
+            <div class="text-black">
+                <h3>Facturar Pedido</h3>
+                <EditForm Model="facturacion" OnValidSubmit="factPedido">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+                    <div class="form-group">
+                        <label for="tipo_factura_id">Tipo Factura</label>
+                        <InputSelect id="tipo_factura_id" class="form-control" @bind-Value="facturacion.tipo_factura_id">
+                            @foreach (var tipoFactura in tiposFactura)
+                            {
+                                <option value="@tipoFactura.id">@tipoFactura.nombre_tipo - @tipoFactura.descripcion </option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label for="producto_id">Metodo de pago</label>
+                        <InputSelect id="metodo_pago_id" class="form-control" @bind-Value="facturacion.metodo_pago_id">
+                            @foreach (var metodoPago in metodosPago)
+                            {
+                                <option value="@metodoPago.id">@metodoPago.descripcion</option>
+                            }
+                        </InputSelect>
+                    </div>
+    
+                    <div class="form-group mt-3">
+                        <button type="submit" class="btn btn-primary">Facturar</button>
+                        <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
+                    </div>
+                </EditForm>
+    
+                <h4>Detalles del Pedido</h4>
+                <table class="table table-dark">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var detalle in pedidoDetalles)
+                        {
+                            <tr>
+                                <td>@detalle.producto.nombre</td>
+                                <td>@detalle.cantidad</td>
+                                <td>@detalle.producto.precio</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
             </div>
-            <div class="form-group">
-                <label for="producto_id">Metodo de pago</label>
-                <InputSelect id="metodo_pago_id" class="form-control" @bind-Value="facturacion.metodo_pago_id">
-                    @foreach (var metodoPago in metodosPago)
-                    {
-                        <option value="@metodoPago.id">@metodoPago.descripcion</option>
-                    }
-                </InputSelect>
-            </div>
-
-            <div class="form-group mt-3">
-                <button type="submit" class="btn btn-primary">Facturar</button>
-                <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
-            </div>
-        </EditForm>
-
-        <h4>Detalles del Pedido</h4>
-        <table class="table">
-            <thead>
-                <tr>
-                    <th>Producto</th>
-                    <th>Cantidad</th>
-                    <th>Precio</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var detalle in pedidoDetalles)
-                {
-                    <tr>
-                        <td>@detalle.producto.nombre</td>
-                        <td>@detalle.cantidad</td>
-                        <td>@detalle.producto.precio</td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        </div>
     </div>
 }
 

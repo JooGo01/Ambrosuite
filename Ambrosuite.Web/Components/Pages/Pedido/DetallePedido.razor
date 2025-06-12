@@ -42,7 +42,7 @@
 }
 else
 {
-    <div class="invoice-container printable-area">
+    <div class="invoice-container printable-area text-black">
         <div class="invoice-header">
             <h2>Pedido</h2>
         </div>
@@ -55,8 +55,8 @@ else
         <h3>Detalles del Pedido</h3>
         @if (detallesPedido != null)
         {
-            <table class="invoice-items">
-                <thead>
+            <table class="invoice-items table table-dark">
+                <thead class="text-black">
                     <tr>
                         <th>Producto</th>
                         <th>Cantidad</th>
