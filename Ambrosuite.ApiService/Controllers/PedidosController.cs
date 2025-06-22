@@ -98,7 +98,12 @@ namespace Ambrosuite.ApiService.Controllers
             _context.Pedidos.Add(pedido);
             await _context.SaveChangesAsync();
             var pedidoResultDto = _mapper.Map<PedidoDTO>(pedidoDto);
-            return Ok(pedidoResultDto);
+            var ultimoPedido = await _context.Pedidos
+                .Include(p => p.mesa)
+                .Include(p => p.usuario)
+                .OrderByDescending(p => p.id)
+                .FirstOrDefaultAsync();
+            return Ok(ultimoPedido);
         }
 
         [HttpPut("{id}")]
