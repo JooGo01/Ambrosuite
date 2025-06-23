@@ -24,7 +24,7 @@ namespace Ambrosuite.ApiService.Controllers
         [HttpGet]
         public async Task<ActionResult<List<ProductoFinal>>> GetAllProductosFinales()
         {
-            var productosFinales = await _context.ProductosFinales.ToListAsync();
+            var productosFinales = await _context.ProductosFinales.Where(p=>p.estado==0).ToListAsync();
             return Ok(productosFinales);
         }
 
