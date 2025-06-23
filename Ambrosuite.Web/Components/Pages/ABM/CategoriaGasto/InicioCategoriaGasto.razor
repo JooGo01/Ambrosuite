@@ -27,7 +27,7 @@
                 <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
             </EditForm>
         }
-
+        <!-- Tabla que muestra las categorías existentes -->
         <table class="table table-dark">
             <thead>
                 <tr>
@@ -40,6 +40,7 @@
                 @foreach (var categoriaGasto in listaCategoriaGasto)
                 {
                     <tr>
+                        <!-- Botón para modificar una categoría -->
                         <td>@categoriaGasto.gasto_nombre</td>
                         <td>@categoriaGasto.gasto_descripcion</td>
                         <td>
@@ -70,7 +71,7 @@
         await LoadCategoriaGasto();
     }
 
-    private async Task LoadCategoriaGasto()
+    private async Task LoadCategoriaGasto()   // Carga la lista de categorías desde el servicio
     {
         try
         {
@@ -88,7 +89,7 @@
         }
     }
 
-    private void MostrarFormularioAgregar()
+    private void MostrarFormularioAgregar()        // Muestra el formulario para agregar una nueva categoría
     {
         categoriaGasto = new CategoriaGasto
             {
@@ -99,14 +100,14 @@
         mostrarFormulario = true;
     }
 
-    private void MostrarFormularioModificar(CategoriaGasto p_categoriagasto)
+    private void MostrarFormularioModificar(CategoriaGasto p_categoriagasto)   // Muestra el formulario para modificar una categoría existente
     {
         categoriaGasto = p_categoriagasto;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
-    private async Task GuardarCategoriaGasto()
+    private async Task GuardarCategoriaGasto()  // Guarda la categoría: agrega o actualiza según corresponda
     {
         if (esNuevoRegistro)
         {
@@ -116,11 +117,11 @@
         {
             await CategoriaGService.updateCategoriaGastoAsync(categoriaGasto);
         }
-        listaCategoriaGasto = await CategoriaGService.GetCategoriaGastosAsync();
+        listaCategoriaGasto = await CategoriaGService.GetCategoriaGastosAsync();  // Actualiza la lista después de guardar
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar()  // Cancela y oculta el formulario
     {
         mostrarFormulario = false;
     }
