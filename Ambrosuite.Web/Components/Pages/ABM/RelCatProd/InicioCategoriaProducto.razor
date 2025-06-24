@@ -15,11 +15,13 @@
 
         @if (mostrarFormulario)
         {
+            <!-- Formulario para agregar o modificar categoría producto -->
             <EditForm Model="categoria" OnValidSubmit="GuardarCategoriaProducto">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 <div class="form-group">
+                    <!-- Selección de Producto -->
                     <label for="producto_id">Producto</label>
                     <InputSelect id="producto_id" class="form-control" @bind-Value="categoria.producto_id">
                         @foreach (var productoFinal in productos)
@@ -30,6 +32,7 @@
                 </div>
 
                 <div class="form-group">
+                    <!-- Selección de Categoría -->
                     <label for="categoria_id">Categoria</label>
                     <InputSelect id="categoria_id" class="form-control" @bind-Value="categoria.categoria_id">
                         @foreach (var cate in listaCategoria)
@@ -47,6 +50,7 @@
         }
 
         <table class="table table-dark">
+            <!-- Tabla de categorías de producto -->
             <thead>
                 <tr>
                     <th>Producto</th>
@@ -76,14 +80,15 @@
     private bool isLoading = true;
     private bool isVisible = false;
     private string? error;
-    private CategoriaProducto categoria = new CategoriaProducto { 
+    private CategoriaProducto categoria = new CategoriaProducto
+        {  // Modelo del formulario
 			categoria_id = 0,
 			producto_id = 0
     };
     private bool mostrarFormulario = false;
     private bool esNuevoRegistro = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() // Inicialización al cargar la página
     {
         await LoadCategoria();
         await LoadProducto();
@@ -100,7 +105,7 @@
         }
     }
 
-    private async Task LoadCategoria()
+    private async Task LoadCategoria()   // Cargar categorías
     {
         try
         {
@@ -118,7 +123,7 @@
         }
     }
 
-    private async Task LoadProducto()
+    private async Task LoadProducto() // Cargar productos
     {
         try
         {
@@ -136,7 +141,7 @@
         }
     }
 
-	private async Task LoadCategoriaProductos()
+    private async Task LoadCategoriaProductos() // Cargar relaciones de producto-categoría
 	{
 		try
 		{
@@ -154,7 +159,7 @@
 		}
 	}
 
-    private void MostrarFormularioAgregar()
+    private void MostrarFormularioAgregar() // Mostrar formulario en modo "agregar"
     {
         categoria = new CategoriaProducto
             {
@@ -165,14 +170,14 @@
         mostrarFormulario = true;
     }
 
-    private void MostrarFormularioModificar(CategoriaProducto p_categoria)
+    private void MostrarFormularioModificar(CategoriaProducto p_categoria)  // Mostrar formulario en modo "modificar"
     {
         categoria = p_categoria;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
-    private async Task GuardarCategoriaProducto()
+    private async Task GuardarCategoriaProducto() // Guardar alta o modificación
     {
         if (esNuevoRegistro)
         {
@@ -182,11 +187,11 @@
         {
             await categoriaProdService.updateCategoriaProductosAsync(categoria);
         }
-        categoriaProductos = await categoriaProdService.GetCategoriaProductosAsync();
+        categoriaProductos = await categoriaProdService.GetCategoriaProductosAsync();  // Recargar la lista y cerrar el formulario
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar()  // Cancelar el formulario
     {
         mostrarFormulario = false;
     }
