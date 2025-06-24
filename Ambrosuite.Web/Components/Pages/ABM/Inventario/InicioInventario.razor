@@ -44,7 +44,7 @@
                 </div>
             </EditForm>
         }
-
+         <!-- Tabla que lista los inventarios actuales -->
         <table class="table table-dark">
             <thead>
                 <tr>
@@ -106,9 +106,9 @@
     {
         try
         {
-            isLoading = true;
+            isLoading = true;  // Indica que se está cargando
             error = null;
-            listaInventario = await InventarioService.GetInventariosAsync();
+            listaInventario = await InventarioService.GetInventariosAsync(); // Obtiene los inventarios de la api
         }
         catch (Exception ex)
         {
@@ -153,9 +153,9 @@
 
     private void MostrarFormularioModificar(Inventario p_inventario)
     {
-        inventario = p_inventario;
-        esNuevoRegistro = false;
-        mostrarFormulario = true;
+        inventario = p_inventario; // Carga los datos del inventario seleccionado
+        esNuevoRegistro = false; // Establece que es una modificacion
+        mostrarFormulario = true; // Muestra el formulario
     }
 
     private async Task GuardarInventario()
@@ -168,8 +168,8 @@
         {
             await InventarioService.updateInventarioAsync(inventario);
         }
-        listaInventario = await InventarioService.GetInventariosAsync();
-        mostrarFormulario = false;
+        listaInventario = await InventarioService.GetInventariosAsync(); // Recarga la lista de inventarios
+        mostrarFormulario = false; // Cierra el formulario
     }
 
     private void Cancelar()
@@ -179,7 +179,7 @@
 
     private async Task EliminarInventario(Inventario p_inventario)
     {
-        await InventarioService.deleteInventarioAsync(p_inventario);
-        listaInventario = await InventarioService.GetInventariosAsync();
+        await InventarioService.deleteInventarioAsync(p_inventario); // Elimina el inventario
+        listaInventario = await InventarioService.GetInventariosAsync(); // Recarga la lista de inventarios
     }
 }
