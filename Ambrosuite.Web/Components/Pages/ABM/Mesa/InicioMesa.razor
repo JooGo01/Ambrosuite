@@ -33,6 +33,7 @@
         }
 
         <table class="table table-dark">
+            <!-- Tabla que muestra las mesas existentes -->
             <thead>
                 <tr>
                     <th>#</th>
@@ -47,7 +48,7 @@
                         <td>@mesa.id</td>
                         <td>@estadoActualDePedido(mesa.estado ?? 0)</td>
                         <td>
-                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(mesa)">Modificar</button>
+                            <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(mesa)">Modificar</button>  <!-- Botón para modificar una mesa -->
                         </td>
                     </tr>
                 }
@@ -68,18 +69,18 @@
     private bool mostrarFormulario = false;
     private bool esNuevoRegistro = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() // Carga inicial de las mesas y los estados al renderizar la página
     {
         await LoadMesa();
         await LoadEstadoMesas();
 
-        if (listEstado.Any())
+        if (listEstado.Any()) // Si hay estados cargados, se selecciona el primero por defecto
         {
             mesa.estado = listEstado.First().num_estado;
         }
     }
 
-	private async Task LoadEstadoMesas()
+    private async Task LoadEstadoMesas() // Genera la lista de estados posibles para las mesas
 	{
 		try
 		{
@@ -102,7 +103,7 @@
 		}
 	}
 
-	private string estadoActualDePedido(int estado) => estado switch
+    private string estadoActualDePedido(int estado) => estado switch // Retorna la descripción textual de un estado según su número
 	{
 		0 => "Disponible",
 		1 => "Ocupada",
@@ -111,7 +112,7 @@
 		_ => "Desconocido"
 	};
 
-    private async Task LoadMesa()
+    private async Task LoadMesa()   // Carga la lista de mesas desde el servicio
     {
         try
         {
@@ -129,7 +130,7 @@
         }
     }
 
-    private async Task MostrarFormularioAgregar()
+    private async Task MostrarFormularioAgregar() // Muestra el formulario vacío para agregar una nueva mesa
     {
         mesa = new Mesa
             {
@@ -140,14 +141,14 @@
         await GuardarMesa();
     }
 
-    private void MostrarFormularioModificar(Mesa p_mesa)
+    private void MostrarFormularioModificar(Mesa p_mesa) // Muestra el formulario con los datos de una mesa para modificarla
     {
         mesa = p_mesa;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
-    private async Task GuardarMesa()
+    private async Task GuardarMesa() // Guarda la mesa: si es nueva, la crea; si existe, la actualiza
     {
         if (esNuevoRegistro)
         {
@@ -157,11 +158,11 @@
         {
             await MesasService.updateTableAsync(mesa);
         }
-        listaMesa = await MesasService.GetTablesAsync();
+        listaMesa = await MesasService.GetTablesAsync(); // Actualiza la lista y oculta el formulario
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar() // Cancela y oculta el formulario
     {
         mostrarFormulario = false;
     }
