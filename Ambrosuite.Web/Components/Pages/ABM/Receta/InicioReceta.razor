@@ -15,11 +15,13 @@
 
         @if (mostrarFormulario)
         {
+            <!-- Formulario para agregar o modificar una receta -->
             <EditForm Model="receta" OnValidSubmit="GuardarReceta">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
                 <div class="form-group">
+                    <!-- Selector de Producto Final -->
                     <label for="producto_final_id">Producto</label>
                     <InputSelect id="producto_final_id" class="form-control" @bind-Value="receta.producto_final_id">
                         @foreach (var productoFinal in listaProducto)
@@ -30,6 +32,7 @@
                 </div>
 
                 <div class="form-group">
+                    <!-- Selector de Ingrediente -->
                     <label for="ingrediente_id">Ingrediente</label>
                     <InputSelect id="ingrediente_id" class="form-control" @bind-Value="receta.ingrediente_id">
                         @foreach (var ing in listaIngrediente)
@@ -40,16 +43,19 @@
                 </div>
 
                 <div class="form-group">
+                    <!-- Campo para la cantidad -->
                     <label for="cantidad">Cantidad</label>
                     <InputNumber id="cantidad" class="form-control" @bind-Value="receta.cantidad"/>
                 </div>
 
                 <div class="form-group">
+                    <!-- Descripción opcional -->
                     <label for="descripcion">Descripcion</label>
                     <InputText id="descripcion" class="form-control" @bind-Value="receta.descripcion" />
                 </div>
 
                 <div class="form-group">
+                    <!-- Botones de acción -->
                     <button type="submit" class="btn btn-success">Guardar</button>
                     <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
                 </div>
@@ -57,6 +63,7 @@
         }
 
         <table class="table table-dark">
+            <!-- Tabla que lista las recetas existentes -->
             <thead>
                 <tr>
                     <th>Producto</th>
@@ -91,23 +98,23 @@
     private bool isLoading = true;
     private bool isVisible = false;
     private string? error;
-	private Receta receta = new Receta
+    private Receta receta = new Receta  // Modelo del formulario
 		{
 			producto_final_id = 0,
 			ingrediente_id = 0,
 			cantidad = 0,
 			descripcion = string.Empty
-		};
-    private bool mostrarFormulario = false;
-    private bool esNuevoRegistro = true;
+		}; 
+    private bool mostrarFormulario = false; // Controla visibilidad del formulario
+    private bool esNuevoRegistro = true; // Alta o modificación
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()  // Al iniciar la página, se cargan los datos necesarios
     {
         await LoadProducto();
         await LoadIngredientes();
         await LoadReceta();
 
-        if (listaProducto.Any())
+        if (listaProducto.Any()) // Si hay productos e ingredientes, se inicializan por defecto
         {
             receta.producto_final_id = listaProducto.First().id;
         }
@@ -118,7 +125,7 @@
         }
     }
 
-    private async Task LoadReceta()
+    private async Task LoadReceta() // Carga todas las recetas
     {
         try
         {
@@ -136,7 +143,7 @@
         }
     }
 
-    private async Task LoadProducto()
+    private async Task LoadProducto() // Carga los productos
     {
         try
         {
@@ -154,7 +161,7 @@
         }
     }
 
-    private async Task LoadIngredientes()
+    private async Task LoadIngredientes() // Carga los ingredientes
     {
         try
         {
@@ -172,7 +179,7 @@
         }
     }
 
-    private void MostrarFormularioAgregar()
+    private void MostrarFormularioAgregar() // Muestra el formulario en modo "agregar"
     {
         receta = new Receta
             {
@@ -185,14 +192,14 @@
         mostrarFormulario = true;
     }
 
-    private void MostrarFormularioModificar(Receta p_receta)
+    private void MostrarFormularioModificar(Receta p_receta)  // Muestra el formulario con datos cargados para modificar
     {
         receta = p_receta;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
-    private async Task GuardarReceta()
+    private async Task GuardarReceta()   // Guarda la receta, alta o modificación según corresponda
     {
         if (esNuevoRegistro)
         {
@@ -202,16 +209,16 @@
         {
             await recetaService.updateRecetaAsync(receta);
         }
-        listaReceta = await recetaService.GetRecetaAsync();
+        listaReceta = await recetaService.GetRecetaAsync(); // Actualiza la lista y oculta el formulario
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar()   // Cancela el formulario
     {
         mostrarFormulario = false;
     }
 
-    private async Task EliminarReceta(Receta p_receta)
+    private async Task EliminarReceta(Receta p_receta)  // Elimina una receta
     {
         await recetaService.bajaRecetaAsync(p_receta);
         listaReceta = await recetaService.GetRecetaAsync();
