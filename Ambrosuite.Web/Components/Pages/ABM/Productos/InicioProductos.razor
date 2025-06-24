@@ -9,10 +9,11 @@
     <div class="main-content text-black">
         <h3>Gestión de Productos</h3>
 
-        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Producto</button>
+        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Producto</button>   <!-- Botón para abrir el formulario de alta de producto -->
 
         @if (mostrarFormulario)
         {
+            <!-- Formulario para agregar o modificar un producto -->
             <EditForm Model="producto" OnValidSubmit="GuardarProducto">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -28,13 +29,14 @@
                 <div class="form-group">
                     <label for="precio">Precio</label>
                     <InputNumber id="precio" class="form-control" @bind-Value="producto.precio" />
-                </div>
+                </div>  <!-- Botones para guardar o cancelar -->
                 <button type="submit" class="btn btn-success">Guardar</button>
                 <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
             </EditForm>
         }
 
         <table class="table table-dark">
+            <!-- Tabla que muestra la lista de productos -->
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -51,6 +53,7 @@
                         <td>@prod.descripcion</td>
                         <td>@prod.precio</td>
                         <td>
+                            <!-- Botones para modificar o eliminar el producto -->
                             <button class="btn btn-warning" @onclick="() => MostrarFormularioModificar(prod)">Modificar</button>
                             <button class="btn btn-danger" @onclick="() => EliminarProducto(prod)">Eliminar</button>
                         </td>
@@ -61,7 +64,7 @@
     </div>
 </div>
 @code {
-    private List<ProductoFinal> listaProductos = new();
+    private List<ProductoFinal> listaProductos = new(); // Lista de productos que se muestran en la tabla
     private bool isLoading = true;
     private bool isVisible = false;
     private string? error;
@@ -72,10 +75,10 @@
 			precio = 0,
 			estado = 0
 		};
-    private bool mostrarFormulario = false;
-    private bool esNuevoRegistro = true;
+    private bool mostrarFormulario = false; // Controla la visibilidad del formulario
+    private bool esNuevoRegistro = true; // Indica si es un alta o una modificación
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()  // Método que se ejecuta al inicializar la página
     {
         await LoadProductos();
     }
@@ -98,7 +101,7 @@
         }
     }
 
-    private void MostrarFormularioAgregar()
+    private void MostrarFormularioAgregar()  // Muestra el formulario vacío para agregar un nuevo producto
     {
         producto = new ProductoFinal
             {
@@ -111,7 +114,7 @@
         mostrarFormulario = true;
     }
 
-    private void MostrarFormularioModificar(ProductoFinal p_producto)
+    private void MostrarFormularioModificar(ProductoFinal p_producto) // Muestra el formulario con los datos de un producto para modificarlo
     {
         producto = p_producto;
         esNuevoRegistro = false;
@@ -119,7 +122,7 @@
 		// selectedCategoriaId = p_producto.categoriaId;
     }
 
-    private async Task GuardarProducto()
+    private async Task GuardarProducto()  // Guarda el producto (si es nuevo lo crea, si existe lo actualiza)
     {
         if (esNuevoRegistro)
         {
@@ -129,16 +132,16 @@
         {
             await productoService.updateProductoAsync(producto);
         }
-        listaProductos = await productoService.GetProductosAsync();
+        listaProductos = await productoService.GetProductosAsync();  // Actualiza la lista y oculta el formulario
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar() // Cancela y oculta el formulario
     {
         mostrarFormulario = false;
     }
 
-    private async Task EliminarProducto(ProductoFinal p_producto)
+    private async Task EliminarProducto(ProductoFinal p_producto) // Elimina un producto y recarga la lista
     {
         await productoService.deleteProductoAsync(p_producto);
         listaProductos = await productoService.GetProductosAsync();
