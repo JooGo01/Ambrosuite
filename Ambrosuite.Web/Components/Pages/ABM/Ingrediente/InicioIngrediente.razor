@@ -9,11 +9,12 @@
     <div class="main-content text-black">
         <h3>Gestión de Ingredientes</h3>
 
-        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Ingrediente</button>
+        <button type="submit" class="btn btn-primary" @onclick="MostrarFormularioAgregar">Agregar Ingrediente</button>  <!-- Botón que abre el formulario para agregar un nuevo ingrediente -->
 
         @if (mostrarFormulario)
         {
             <EditForm Model="ingrediente" OnValidSubmit="GuardarIngrediente">
+                <!-- Formulario para agregar o modificar un ingrediente -->
                 <DataAnnotationsValidator />
                 <ValidationSummary />
 
@@ -33,7 +34,7 @@
                     <label for="alertaCantidad">Alerta Cantidad</label>
                     <InputNumber id="alertaCantidad" class="form-control" @bind-Value="ingrediente.alertaCantidad" />
                 </div>
-                <button type="submit" class="btn btn-success">Guardar</button>
+                <button type="submit" class="btn btn-success">Guardar</button> <!-- Botones para guardar o cancelar -->
                 <button type="button" class="btn btn-secondary" @onclick="Cancelar">Cancelar</button>
             </EditForm>
         }
@@ -67,7 +68,7 @@
     </div>
 </div>
 @code {
-    private List<Ingrediente> listaIngrediente = new();
+    private List<Ingrediente> listaIngrediente = new();  // Modelo para el formulario (agregar o modificar)
     private bool isLoading = true;
     private bool isVisible = false;
     private string? error;
@@ -79,15 +80,15 @@
             alertaCantidad=0,
             estado=0
 		};
-    private bool mostrarFormulario = false;
-    private bool esNuevoRegistro = true;
+    private bool mostrarFormulario = false; // Controla la visibilidad del formulario
+    private bool esNuevoRegistro = true; // Indica si es un alta o una modificación
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync() // Carga inicial de la lista de ingredientes al renderizar la página
     {
         await LoadIngredientes();
     }
 
-    private async Task LoadIngredientes()
+    private async Task LoadIngredientes() // Obtiene la lista de ingredientes desde el servicio
     {
         try
         {
@@ -105,7 +106,7 @@
         }
     }
 
-    private void MostrarFormularioAgregar()
+    private void MostrarFormularioAgregar()  // Muestra el formulario vacío para agregar un nuevo ingrediente
     {
         ingrediente = new Ingrediente
         {
@@ -119,14 +120,14 @@
         mostrarFormulario = true;
     }
 
-    private void MostrarFormularioModificar(Ingrediente p_ingrediente)
+    private void MostrarFormularioModificar(Ingrediente p_ingrediente) // Muestra el formulario con los datos de un ingrediente para modificarlo
     {
         ingrediente = p_ingrediente;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
-    private async Task GuardarIngrediente()
+    private async Task GuardarIngrediente() // Guarda el ingrediente: si es nuevo lo agrega, si existe lo actualiza
     {
         if (esNuevoRegistro)
         {
@@ -136,16 +137,16 @@
         {
             await IngredienteService.updateIngredienteAsync(ingrediente);
         }
-        listaIngrediente = await IngredienteService.GetIngredienteAsync();
+        listaIngrediente = await IngredienteService.GetIngredienteAsync();  // Actualiza la lista después de guardar y oculta el formulario
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar() // Cancela la operación y oculta el formulario
     {
         mostrarFormulario = false;
     }
 
-    private async Task EliminarIngrediente(Ingrediente p_ingrediente)
+    private async Task EliminarIngrediente(Ingrediente p_ingrediente)  // Elimina el ingrediente seleccionado y actualiza la lista
     {
         await IngredienteService.deleteIngredienteAsync(p_ingrediente);
         listaIngrediente = await IngredienteService.GetIngredienteAsync();
