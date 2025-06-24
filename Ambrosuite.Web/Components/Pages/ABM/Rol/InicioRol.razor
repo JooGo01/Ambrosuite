@@ -13,6 +13,7 @@
 
         @if (mostrarFormulario)
         {
+            <!-- Formulario para agregar o modificar un rol -->
             <EditForm Model="rol" OnValidSubmit="GuardarRol">
                 <DataAnnotationsValidator />
                 <ValidationSummary />
@@ -31,6 +32,7 @@
         }
 
         <table class="table table-dark">
+            <!-- Tabla de roles -->
             <thead>
                 <tr>
                     <th>Nombre</th>
@@ -67,12 +69,12 @@
     private bool mostrarFormulario = false;
     private bool esNuevoRegistro = true;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnInitializedAsync()   // Carga inicial
     {
         await LoadRoles();
     }
 
-    private async Task LoadRoles()
+    private async Task LoadRoles()  // Carga de roles
     {
         try
         {
@@ -90,7 +92,7 @@
         }
     }
 
-    private void MostrarFormularioAgregar()
+    private void MostrarFormularioAgregar()  // Mostrar formulario para agregar
     {
         rol = new Rol
             {
@@ -101,14 +103,14 @@
         mostrarFormulario = true;
     }
 
-    private void MostrarFormularioModificar(Rol p_rol)
+    private void MostrarFormularioModificar(Rol p_rol) // Mostrar formulario para modificar
     {
         rol = p_rol;
         esNuevoRegistro = false;
         mostrarFormulario = true;
     }
 
-    private async Task GuardarRol()
+    private async Task GuardarRol() // Guardar alta o modificación
     {
         if (esNuevoRegistro)
         {
@@ -122,12 +124,12 @@
         mostrarFormulario = false;
     }
 
-    private void Cancelar()
+    private void Cancelar()  // Cancelar el formulario
     {
         mostrarFormulario = false;
     }
 
-    private async Task EliminarRol(Rol p_rol)
+    private async Task EliminarRol(Rol p_rol)  // Eliminar rol
     {
         await RolService.deleteRolAsync(p_rol);
         listaRol = await RolService.GetRolesAsync();
