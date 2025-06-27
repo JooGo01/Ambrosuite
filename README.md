@@ -42,10 +42,10 @@ Ambrosuite.ApiService/
 
 ## 🧑‍💻 Autores
 
-- Matías Molina – [@matias.molina@davinci.edu.ar](mailto:matias.molina@davinci.edu.ar)
-- Esteban Inturri – [@esteban.inturri@davinci.edu.ar](mailto:esteban.inturri@davinci.edu.ar)
-- Sebastián Paz Friaz – [@sebastian.paz@davinci.edu.ar](mailto:sebastian.paz@davinci.edu.ar)
-- José Gómez – [@jose.gomez@davinci.edu.ar](mailto:jose.gomez@davinci.edu.ar)
+- Matías Molina – [matias.molina@davinci.edu.ar](mailto:matias.molina@davinci.edu.ar)
+- Esteban Inturri – [esteban.inturri@davinci.edu.ar](mailto:esteban.inturri@davinci.edu.ar)
+- Sebastián Paz Friaz – [sebastian.paz@davinci.edu.ar](mailto:sebastian.paz@davinci.edu.ar)
+- José Gómez – [jose.gomez@davinci.edu.ar](mailto:jose.gomez@davinci.edu.ar)
 
 ---
 
