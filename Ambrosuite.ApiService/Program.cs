@@ -28,7 +28,8 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 {
     serverOptions.Listen(System.Net.IPAddress.Any, 5000);
     serverOptions.Listen(System.Net.IPAddress.Any, 5001, listenOptions => {
-        listenOptions.UseHttps();
+        //listenOptions.UseHttps();
+        listenOptions.UseHttps("/etc/https/https.crt", "/etc/https/https.key");
     });
 });
 

@@ -18,12 +18,29 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.2.0" />
   </ItemGroup>
+  
+   <ItemGroup>
+  <None Update="..\Ambrosuite.ApiService\appsettings.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </None>
+  <None Update="..\Ambrosuite.ApiService\appsettings.Development.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </None>
+  <Content Update="..\Ambrosuite.ApiService\appsettings.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </Content>
+  <Content Update="..\Ambrosuite.ApiService\appsettings.Development.json">
+    <CopyToPublishDirectory>Never</CopyToPublishDirectory>
+  </Content>
+</ItemGroup>
+
+
 
   <ItemGroup>
     <ProjectReference Include="..\Ambrosuite.ApiService\Ambrosuite.ApiService.csproj" />
     <ProjectReference Include="..\Ambrosuite.ServiceDefaults\Ambrosuite.ServiceDefaults.csproj" />
   </ItemGroup>
-
+ 
   <ItemGroup>
     <Content Update="Components\Pages\Consulta\ConsultaAlertaStock.razor">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
