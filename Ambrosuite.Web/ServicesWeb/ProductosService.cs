@@ -11,7 +11,8 @@ namespace Ambrosuite.Web.ServicesWeb
         public ProductosService(HttpClient httpClient)
         {
             _httpClient = httpClient;
-            _httpClient.BaseAddress = new Uri("https://localhost:5001");
+            //_httpClient.BaseAddress = new Uri("https://localhost:5001");
+            _httpClient.BaseAddress = new Uri("http://localhost:5000");
         }
 
         public async Task<List<ProductoFinal>> GetProductosAsync()

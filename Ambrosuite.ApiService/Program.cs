@@ -24,14 +24,13 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
 });
 */
 
-builder.WebHost.ConfigureKestrel(serverOptions =>
-{
-    serverOptions.Listen(System.Net.IPAddress.Any, 5000);
-    serverOptions.Listen(System.Net.IPAddress.Any, 5001, listenOptions => {
-        //listenOptions.UseHttps();
-        listenOptions.UseHttps("/etc/https/https.crt", "/etc/https/https.key");
-    });
-});
+//builder.WebHost.ConfigureKestrel(serverOptions =>
+//{
+//    builder.WebHost.ConfigureKestrel(serverOptions =>
+//    {
+//        serverOptions.Listen(System.Net.IPAddress.Any, 5000); // HTTP interno
+//    });
+//});
 
 /*
 builder.Services.AddCors(options =>
@@ -111,7 +110,21 @@ app.UseExceptionHandler();
 
 app.UseCors("AllowAll");
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
+/*
+app.Use(async (context, next) =>
+{
+    if (!context.Request.IsHttps)
+    {
+        var withHttps = $"https://{context.Request.Host.Host}:5001{context.Request.Path}{context.Request.QueryString}";
+        context.Response.Redirect(withHttps);
+    }
+    else
+    {
+        await next();
+    }
+});
+*/
 
 app.UseAuthorization();
 
