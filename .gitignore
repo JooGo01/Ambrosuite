@@ -361,3 +361,6 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/Ambrosuite.ApiService/appsettings.json
+/Ambrosuite.ApiService/appsettings.Development.json
+/Ambrosuite.ApiService/appsettings.Production.json
